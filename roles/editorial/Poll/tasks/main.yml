@@ -1,0 +1,103 @@
+
+# Ansible que instala poll
+
+
+
+- name: asegurar que {{local2}} exists
+  file: path="{{local2}}"   state=directory owner=manduca group=manduca recurse=yes
+  tags: cvs
+
+- name:  CVS Loguin {{poll}}
+  shell: cvs -d :pserver:manduca:D3c4r#m6o!A@{{cvs_ip}}:/home/cvs/commons/ login
+  sudo: yes
+  sudo_user: manduca 
+  tags:  cvs
+
+- name:  Checkout del proyecto  {{poll}}
+  command: chdir={{local2}} cvs -d :pserver:manduca@{{cvs_ip}}:/home/cvs/commons checkout {{poll}}
+  sudo: yes
+  sudo_user: manduca 
+  tags: cvs
+
+- name:  Ant config {{poll}}
+  shell: chdir={{local2}}/{{poll}}/conf export LC_ALL=es_VE.ISO8859-1 && ant cvsConfigP
+  sudo: yes
+  sudo_user: manduca 
+  environment: manduca_env
+  tags: antconfig
+
+- name: asegurar que {{local2}}/{{poll}}/rootAdmin/WEB-INF/lib exists
+  file: path="{{local2}}/{{poll}}/rootEU/WEB-INF/lib"  state=link  src="{{local2}}/lib"  owner=manduca group=manduca 
+  tags: linki
+
+- name: asegurar que {{local2}}/{{poll}}/root/WEB-INF/lib exists
+  file: path="{{local2}}/{{poll}}/root/WEB-INF/lib"  state=link  src="{{local2}}/lib"  owner=manduca group=manduca 
+  tags: linki
+
+
+- name: Copio libs de DEUutil a {{poll}} rootEU
+  shell: cp {{local2}}/DEUutil/DEUutil.jar {{local2}}/{{poll}}/rootEU/WEB-INF/lib/
+  sudo: yes
+  sudo_user: manduca 
+  tags: copy
+
+- name: Copio libs de SrcCommons a {{poll}} rootEU
+  shell: cp {{local2}}/srcCommons/srcCommons.jar {{local2}}/{{poll}}/rootEU/WEB-INF/lib/
+  sudo: yes
+  sudo_user: manduca 
+  tags: copy
+
+- name: Copio libs de DEUutil a {{poll}} root
+  shell: cp {{local2}}/DEUutil/DEUutil.jar {{local2}}/{{poll}}/root/WEB-INF/lib/
+  sudo: yes
+  sudo_user: manduca 
+  tags: copy
+
+- name: Copio libs de SrcCommons a {{poll}} root
+  shell: cp {{local2}}/srcCommons/srcCommons.jar {{local2}}/{{poll}}/root/WEB-INF/lib/
+  sudo: yes
+  sudo_user: manduca 
+  tags: copy
+
+- name: Reemplazar buildproperties con el template {{poll}}
+  template:
+    src=build.properties.j2
+    dest="{{local2}}/{{poll}}/conf/build.properties"
+  sudo: yes
+  sudo_user: manduca 
+  tags: reemp
+
+- name: Reemplazar admin.sh con el template {{poll}}
+  template:
+    src=admin.sh.j2
+    dest="{{local2}}/{{poll}}/conf/admin.sh"
+  sudo: yes
+  sudo_user: manduca 
+  tags: reemp
+
+- name: Reemplazar resinAdmin.conf con el template {{poll}}
+  template:
+    src=resinAdmin.conf.j2
+    dest="{{local2}}/{{poll}}/conf/resinAdmin.conf"
+  sudo: yes
+  sudo_user: manduca 
+  tags: reemp
+
+- name:  run ant build {{poll}}
+  shell: chdir={{local2}}/{{poll}}/conf export LC_ALL=es_VE.ISO8859-1 && ant build
+  sudo: yes
+  sudo_user: manduca 
+  environment: manduca_env
+  tags: build
+
+- name:  run ant build {{poll}}
+  shell: chdir={{local2}}/{{poll}}/conf export LC_ALL=es_VE.ISO8859-1 && ant buildEU
+  sudo: yes
+  sudo_user: manduca 
+  environment: manduca_env
+  tags: build
+
+
+
+
+

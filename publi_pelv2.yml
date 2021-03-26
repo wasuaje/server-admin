@@ -1,0 +1,41 @@
+# file: editorial_app01.yml
+
+- hosts: pelv2
+  user: root  
+  gather_facts: True   
+  vars: 
+  - ip_service: "10.1.5.234"
+  - main_app_home: "/usr/local"
+  - local2: "/local2/applications/" #por compatibilidad con otros role y para mantenerlos independiente
+  - tomcat_port: "80"
+  - tomcat_ip: "10.1.5.234"
+  - cvs_ip: "190.153.52.48"
+  - java_home: "{{main_app_home}}/jdk7"    #necesario porque los prerequisitos andan primero que el seteo de vars  
+  - password: ""
+  - publica_pass: ""
+  #- java_home: "{{main_app_home}}/jdk7"    #necesario porque los prerequisitos andan primero que el seteo de vars
+  #- catalina_home: "{{main_app_home}}/apache-tomcat"
+  - manduca_env:
+      JAVA_HOME: "/usr/local/jdk1.7.0_65"
+      ANT_HOME: "/usr/local/ant"            
+      #LANG: "es_VE.ISO8859-1"  
+      PATH: "PATH=/usr/lib64/qt-3.3/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/local/ant/bin:/home/manduca/bin" 
+
+  roles:    
+  - common
+  - prerequisitos/java-7u65
+  - prerequisitos/apache-ant  
+  - prerequisitos/glassfish-311
+  #EJECUTAR LUEGO POR SEPARADO EL ROL PARA DBSERVER YA QUE ESTE ES UNA MEZCLA
+
+  tasks:    
+
+    - name: Actualizar variables de ambiente en /etc/profile (para todos)
+      shell: echo {{item}} >> /etc/profile
+      with_items:
+      - "###### SETEADOS AUTOMATICAMENTE CON ANSIBLE #######"
+      - "export JAVA_HOME=/usr/local/jdk7"      
+      - "export ANT_HOME=/usr/local/ant"            
+      - "export PATH=$PATH:/usr/local/ant/bin:/usr/local/jdk7/bin"
+      tags: env
+              

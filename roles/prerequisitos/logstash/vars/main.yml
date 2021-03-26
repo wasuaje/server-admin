@@ -1,0 +1,6 @@
+
+
+
+lg_download: "https://download.elasticsearch.org/logstash/logstash/"
+lg_pack: "logstash-1.4.2.tar.gz"
+lg_home: "/usr/local/logstash-1.4.2"

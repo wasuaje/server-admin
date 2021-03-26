@@ -1,0 +1,75 @@
+
+
+# Ansible que instala MigrateElasticSearch
+
+- name: asegurar que {{local2}} exists
+  file: path="{{local2}}"   state=directory owner=manduca group=manduca recurse=yes
+  tags: cvs
+
+- name:  CVS Loguin MigrateElasticSearch
+  shell: cvs -d :pserver:manduca:D3c4r#m6o!A@{{cvs_ip}}:/home/cvs/commons/ login
+  sudo: yes
+  sudo_user: manduca 
+  tags:  cvs
+
+- name:  Checkout del proyecto MigrateElasticSearch
+  command: chdir={{local2}} cvs -d :pserver:manduca@{{cvs_ip}}:/home/cvs/commons checkout {{MigrateElasticSearch}}
+  sudo: yes
+  sudo_user: manduca 
+  tags: mig
+
+- name:  Upadate del proyecto MigrateElasticSearch
+  command: chdir={{local2}}/{{MigrateElasticSearch}} cvs update -r PRODUCCION
+  sudo: yes
+  sudo_user: manduca 
+  tags: mig
+
+- name: Copio libs de DEUutil a MigrateElasticSearch
+  shell: cp {{local2}}/DEUutil/DEUutil.jar {{local2}}/{{MigrateElasticSearch}}/lib/
+  sudo: yes
+  sudo_user: manduca 
+  tags: mig
+
+- name: Copio libs de ApiSearchElasticSearch a MigrateElasticSearch
+  shell: cp {{local2}}/ApiSearchElasticSearch/apiSearchElasticSearch.jar {{local2}}/{{MigrateElasticSearch}}/lib/
+  sudo: yes
+  sudo_user: manduca 
+  tags: mig
+
+- name: Copio libs de srcCommons a MigrateElasticSearch
+  shell: cp {{local2}}/srcCommons/srcCommons.jar {{local2}}/{{MigrateElasticSearch}}/lib/
+  sudo: yes
+  sudo_user: manduca 
+  tags: mig
+
+- name: Reemplazar buildproperties con el template MigrateElasticSearch
+  template:
+    src=build.properties.j2
+    dest="{{local2}}/{{MigrateElasticSearch}}/conf/build.properties"
+  sudo: yes
+  sudo_user: manduca 
+  tags: mig
+
+- name: Reemplazar migrateproperties con el template MigrateElasticSearch
+  template:
+    src=Migrate.properties.j2
+    dest="{{local2}}/{{MigrateElasticSearch}}/src/Migrate.properties"
+  sudo: yes
+  sudo_user: manduca 
+  tags: mig
+
+- name: Reemplazar migrate.sh con el template MigrateElasticSearch
+  template:
+    src=migrate.sh.j2
+    dest="{{local2}}/{{MigrateElasticSearch}}/scripts/migrate.sh"
+  sudo: yes
+  sudo_user: manduca 
+  tags: mig
+
+- name:  run ant build MigrateElasticSearch
+  shell: chdir={{local2}}/{{MigrateElasticSearch}}/conf export LC_ALL=es_VE.ISO8859-1 && ant build
+  sudo: yes
+  sudo_user: manduca 
+  environment: manduca_env
+  tags: mig
+

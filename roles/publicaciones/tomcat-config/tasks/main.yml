@@ -1,0 +1,15 @@
+
+
+
+
+- name: configures server.xml
+  template:
+    src=server.xml.j2
+    dest="{{tomcat_dir}}/conf/server.xml"
+  tags: tomcat-config
+
+- name: configures logging.properties
+  template:
+    src="logging.properties.j2"
+    dest="{{tomcat_dir}}/conf/logging.properties"
+  tags: tomcat-config

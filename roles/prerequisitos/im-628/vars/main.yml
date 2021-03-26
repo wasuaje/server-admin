@@ -1,0 +1,8 @@
+#vars for java 5
+
+im_pack: 'ImageMagick-6.9.0-3.tar.gz'
+
+im_home: '/usr/local/IM-6.9.0-3'
+
+im_src: '/usr/local/src/ImageMagick-6.9.0-3'
+

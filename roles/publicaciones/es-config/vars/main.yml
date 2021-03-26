@@ -1,0 +1,10 @@
+---
+# vars file for elastic
+
+elastic_network_host: "[204.228.236.7,204.228.236.9]"
+
+elastic_transport_tcp_port: 6200
+
+elastic_html_port: 9200
+
+elastic_home: "/usr/local/elasticsearch"

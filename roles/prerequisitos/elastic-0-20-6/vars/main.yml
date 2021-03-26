@@ -1,0 +1,5 @@
+
+
+
+es3026_pack: "elasticsearch-0.20.6.tar.gz"
+es3026_home: "/usr/local/elasticsearch-0.20.6"

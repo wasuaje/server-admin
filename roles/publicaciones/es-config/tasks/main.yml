@@ -1,0 +1,8 @@
+
+
+
+- name: Reemplazar elasticsearch.yml en elasticsearch
+  template:
+    src=elasticsearch.yml.j2
+    dest="{{elastic_home}}/config/elasticsearch.yml"
+  tags: es-config

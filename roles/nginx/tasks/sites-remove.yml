@@ -1,0 +1,21 @@
+
+- name: Eliminando Link Simbolico
+  template:
+    src={{ nginx_avail }}{{ item }}
+    dest={{ nginx_home }}{{ nginx_avail }}{{ item }}    
+    owner=root
+    group=root  
+  with_items:
+    - "{{ templates }}"
+
+
+
+- name: Eliminando Site Available
+  file: 
+    src={{ nginx_home }}{{ nginx_avail }}{{ item }}
+    dest={{ nginx_home }}{{ nginx_enabl }}{{ item }}
+    state=link 
+    force=yes
+  with_items:
+    - "{{ templates }}" 
+

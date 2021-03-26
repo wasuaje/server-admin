@@ -1,0 +1,6 @@
+
+
+
+es142_download: "https://download.elasticsearch.org/elasticsearch/elasticsearch/"
+es142_pack: "elasticsearch-1.4.4.tar.gz"
+es142_home: "/usr/local/elasticsearch-1.4.4"

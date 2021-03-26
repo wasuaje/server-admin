@@ -1,0 +1,112 @@
+
+# Ansible que instala publisher1 1
+
+- name: asegurar que {{local2}} exists
+  file: path="{{local2}}"   state=directory owner=manduca group=manduca recurse=yes
+  tags: cvs
+
+- name:  CVS Loguin {{publisher1}}
+  shell: cvs -d :pserver:manduca:D3c4r#m6o!A@{{cvs_ip}}:/home/cvs/commons login
+  sudo: yes
+  sudo_user: manduca 
+  tags:  cvs
+
+- name:  Checkout del proyecto {{publisher1}}
+  command: chdir={{local2}} cvs -d :pserver:manduca@{{cvs_ip}}:/home/cvs/commons checkout -d publisher eupublish
+  sudo: yes
+  sudo_user: manduca 
+  tags: cvs
+
+- name:  Ant config  {{publisher1}}
+  shell: chdir={{local2}}/{{publisher1}}/conf export LC_ALL=es_VE.ISO8859-1 && ant cvsConfigPub
+  sudo: yes
+  sudo_user: manduca 
+  environment: manduca_env
+  tags: antconfig
+
+- name: Copio libs de DEUutil a {{publisher1}}
+  shell: cp {{local2}}/DEUutil/DEUutil.jar {{local2}}/{{publisher1}}/root/WEB-INF/lib/
+  sudo: yes
+  sudo_user: manduca 
+  tags: pub1
+
+- name: Copio libs de SrcCommons a {{publisher1}}
+  shell: cp {{local2}}/srcCommons/srcCommons.jar {{local2}}/{{publisher1}}/root/WEB-INF/lib/
+  sudo: yes
+  sudo_user: manduca 
+  tags: pub1
+
+- name: Copio libs de ApiSearchElasticSearch a {{publisher1}}
+  shell: cp {{local2}}/ApiSearchElasticSearch/apiSearchElasticSearch.jar {{local2}}/{{publisher1}}/root/WEB-INF/lib/
+  sudo: yes
+  sudo_user: manduca 
+  tags: pub1
+
+- name: Copio libs de migrateToElasticSearch a {{publisher1}}
+  shell: cp {{local2}}/MigrateToElasticSearch/migrateToElasticSearch.jar {{local2}}/{{publisher1}}/root/WEB-INF/lib/
+  sudo: yes
+  sudo_user: manduca 
+  tags: pub1
+
+- name: Reemplazar buildproperties con el template {{publisher1}}
+  template:
+    src=build.properties.j2
+    dest="{{local2}}/{{publisher1}}/conf/build.properties"
+  sudo: yes
+  sudo_user: manduca 
+  tags: pub1
+
+- name: Reemplazar publisher.sh.j2 con el template {{publisher1}}
+  template:
+    src=publisher.sh.j2
+    dest="{{local2}}/{{publisher1}}/conf/publisher.sh"
+  sudo: yes
+  sudo_user: manduca 
+  tags: pub1
+
+- name: Reemplazar resin_publisher.conf.j2 con el template {{publisher1}}
+  template:
+    src=resin_publisher.conf.j2
+    dest="{{local2}}/{{publisher1}}/conf/resin_publisher.conf"
+  sudo: yes
+  sudo_user: manduca 
+  tags: pub1
+
+- name: Reemplazar Configuration.properties.j2 con el template {{publisher1}}
+  template:
+    src=Configuration.properties.j2
+    dest="{{local2}}/{{publisher1}}/root/WEB-INF/resources/Configuration.properties"
+  sudo: yes
+  sudo_user: manduca 
+  tags: pub1
+
+- name: Reemplazar Global.properties con el template {{publisher1}}
+  template:
+    src=Global.properties.j2
+    dest="{{local2}}/{{publisher1}}/root/WEB-INF/resources/Global.properties"
+  sudo: yes
+  sudo_user: manduca 
+  tags: pub1
+
+- name: Reemplazar log4j.properties.j2 con el template {{publisher1}}
+  template:
+    src=log4j.properties.j2
+    dest="{{local2}}/{{publisher1}}/root/WEB-INF/resources/log4j.properties.j2"
+  sudo: yes
+  sudo_user: manduca 
+  tags: pub1
+
+- name:  run ant build {{publisher1}}
+  shell: chdir={{local2}}/{{publisher1}}/conf export LC_ALL=es_VE.ISO8859-1 && ant compile
+  sudo: yes
+  sudo_user: manduca 
+  environment: manduca_env
+  tags: pub1
+
+- name:  Start {{publisher1}}
+  shell: chdir={{local2}}/{{publisher1}}/conf chmod +x publisher.sh ./publisher.sh start
+  sudo: yes
+  sudo_user: manduca
+  tags: pub1 
+
+

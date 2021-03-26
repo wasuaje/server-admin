@@ -1,0 +1,86 @@
+
+# Ansible que instala AjaxConnection
+
+
+- name: asegurar que {{local2}} exists
+  file: path="{{local2}}"   state=directory owner=manduca group=manduca recurse=yes
+  tags: cvs
+
+- name:  CVS Loguin {{AjaxConnection}}
+  shell: cvs -d :pserver:manduca:D3c4r#m6o!A@{{cvs_ip}}:/home/cvs/commons/ login
+  sudo: yes
+  sudo_user: manduca
+  tags:  cvs
+
+- name:  Checkout del proyecto  {{AjaxConnection}}
+  command: chdir={{local2}} cvs -d :pserver:manduca@{{cvs_ip}}:/home/cvs/commons checkout {{AjaxConnection}}
+  sudo: yes
+  sudo_user: manduca
+  tags: cvs
+
+- name:  Ant config   {{AjaxConnection}}
+  shell: chdir={{local2}}/{{AjaxConnection}}/conf export LC_ALL=es_VE.ISO8859-1 && echo -e "manduca\n1S6PR'+5K6w1LRI'\n" ant cvsConfigP
+  sudo: yes
+  sudo_user: manduca
+  environment: manduca_env
+  tags: antconfig
+
+
+- name: Copio libs de DEUutil a {{AjaxConnection}}
+  shell: cp {{local2}}/DEUutil/DEUutil.jar {{local2}}/{{AjaxConnection}}/rootEU/WEB-INF/lib/
+  sudo: yes
+  sudo_user: manduca
+  tags: copy
+
+- name: Copio libs de SrcCommons a {{AjaxConnection}}
+  shell: cp {{local2}}/srcCommons/srcCommons.jar {{local2}}/{{AjaxConnection}}/rootEU/WEB-INF/lib/
+  sudo: yes
+  sudo_user: manduca
+  tags: copy
+
+- name: Reemplazar buildproperties con el template {{AjaxConnection}}
+  template:
+    src=build.properties.j2
+    dest="{{local2}}/{{AjaxConnection}}/conf/build.properties"
+  sudo: yes
+  sudo_user: manduca
+  tags: reemp
+
+- name: Reemplazar dynamic_est.sh con el template {{AjaxConnection}}
+  template:
+    src=dynamic_est.sh
+    dest="{{local2}}/{{AjaxConnection}}/conf/dynamic_est.sh"
+  sudo: yes
+  sudo_user: manduca
+  tags: reemp
+
+- name: Reemplazar dynamic_eu.sh con el template {{AjaxConnection}}
+  template:
+    src=dynamic_eu.sh
+    dest="{{local2}}/{{AjaxConnection}}/conf/dynamic_eu.sh"
+  sudo: yes
+  sudo_user: manduca
+  tags: reemp
+
+- name: Reemplazar resinDynamicEST.conf.j2 con el template {{AjaxConnection}}
+  template:
+    src=resinDynamicEST.conf.j2
+    dest="{{local2}}/{{AjaxConnection}}/conf/resinDynamicEST.conf"
+  sudo: yes
+  sudo_user: manduca
+  tags: reemp
+
+- name: Reemplazar resinDynamicEU.conf.j2 con el template {{AjaxConnection}}
+  template:
+    src=resinDynamicEU.conf
+    dest="{{local2}}/{{AjaxConnection}}/conf/resinDynamicEU.conf"
+  sudo: yes
+  sudo_user: manduca
+  tags: reemp
+
+- name:  run ant build {{AjaxConnection}}
+  shell: chdir={{local2}}/{{AjaxConnection}}/conf export LC_ALL=es_VE.ISO8859-1 && ant build
+  sudo: yes
+  sudo_user: manduca
+  environment: manduca_env
+  tags: build

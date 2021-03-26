@@ -1,0 +1,15 @@
+
+---
+# vars file for gs
+
+#java_home_5: "/usr/local/jdk1.5.0_22"
+
+datasourceurl: "jdbc:oracle:thin:@204.228.236.50:1521:content"
+datasourceuser: "content"
+datasourcepassword: "P0nZ0n#0$4!"
+searchelasticsearchhost: "http://{{ip_service}}}:8484"
+searchelasticsearchuser: "eluniversal"
+searchelasticsearchpass: "3lun1v3rs4l"
+smtphost: "correo.eluniversal.com"
+
+MigrateElasticSearch: "MigrateToElasticSearch"

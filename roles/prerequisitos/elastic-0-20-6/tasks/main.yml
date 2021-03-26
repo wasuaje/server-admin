@@ -1,0 +1,15 @@
+
+
+
+- name: Copio el elasticsearch 
+  copy: src={{es3026_pack}} dest=/usr/local/src
+  tags: es3026
+
+- name: Descomprimo elasticsearch
+  shell: tar -zxvf  /usr/local/src/{{es3026_pack}} -C /usr/local
+  tags: es3026
+
+- name: Hacer dueño a manduca
+  shell: chown manduca.manduca -R {{es3026_home}}
+  tags: es3026
+

@@ -1,0 +1,44 @@
+
+# Ansible que instala la guia de servicios
+# Requiere ip con acceso a 204.228.236.7:6200 <-cable
+# Requiere ant
+# http://204.13.51.76/GS/2014-06-15    -> ejemplo para verificar que funcione, debe traer un json con data
+
+- name: asegurar que {{local2}} exists
+  file: path="{{local2}}"   state=directory owner=manduca group=manduca
+  tags: cvs
+
+- name:  CVS Loguin DEUutil
+  shell: cvs -d :pserver:manduca:D3c4r#m6o!A@{{cvs_ip}}:/home/cvs/commons login  
+  sudo: yes
+  sudo_user: manduca 
+  tags:  cvs
+
+- name:  Checkout del proyecto DEUutil
+  shell: chdir={{local2}} cvs -d :pserver:manduca@{{cvs_ip}}:/home/cvs/commons checkout {{DEUutil}}
+  sudo: yes
+  sudo_user: manduca    
+  tags: cvs
+
+- name:  Update del proyecto DEUutil
+  shell: chdir={{local2}}/{{DEUutil}} cvs update -r PRODUCCION
+  sudo: yes
+  sudo_user: manduca  
+  tags: cvs
+
+- name: Reemplazar buildproperties con el template DEUutil
+  template:
+    src=build.properties.j2
+    dest="{{local2}}/{{DEUutil}}/conf/build.properties"    
+  sudo: yes
+  sudo_user: manduca  
+  tags: deuu
+
+- name:  run ant build DEUutil
+  shell: chdir={{local2}}/{{DEUutil}}/conf export LC_ALL=es_VE.ISO8859-1 && ant build
+  sudo: yes
+  sudo_user: manduca
+  environment: manduca_env
+  tags: build
+
+

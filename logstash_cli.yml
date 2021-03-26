@@ -1,0 +1,28 @@
+# file: logstash_cli.yml
+
+- hosts: all
+  user: root  
+  
+  vars:  
+  - main_app_home: "/usr/local"
+  - manduca_env:
+      JAVA_HOME: "/usr/local/jdk7"      
+      PATH: "/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/bin:/usr/local/jdk7/bin" 
+
+  roles:
+  - prerequisitos/java-7u65
+  - prerequisitos/logstash-cli
+
+  tasks: 
+
+  - name: Iniciar servicio Logstash
+    shell: chkconfig logstash-cli on;  /etc/init.d/logstash-cli start
+    tags: lg144
+    environment: manduca_env
+
+
+#logstash en cada maquina
+
+
+#Ejecutese asi 
+# ansible-playbook -i desa  -l  10.1.176.91 logstash_cli.yml -C

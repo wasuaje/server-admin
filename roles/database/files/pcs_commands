@@ -1,0 +1,87 @@
+
+##################
+#### CONTENT #####
+
+pcs resource create ContentIp ocf:heartbeat:IPaddr2 ip=10.6.1.37 cidr_netmask=16 op monitor interval=30s --group Content
+
+pcs resource create  ContentListener ocf:heartbeat:oralsnr params sid="content" user="oracle" \
+  listener="LISTENER_CONTENT" home=/opt/app/oracle/product/12.1.0/dbhome_1/ \
+  op monitor interval="30s" timeout=30s  op start timeout="120s" op stop timeout="120s" --group Content
+
+pcs resource create ContentInstance ocf:heartbeat:oracle params sid=content user="oracle" \
+     home=/opt/app/oracle/product/12.1.0/dbhome_1/ op monitor interval=120s timeout=30s \
+     op  start timeout="120s" op stop timeout="120s" --group Content
+
+pcs constraint colocation add ContentListener ContentIp INFINITY
+pcs constraint colocation add ContentInstance ContentListener INFINITY
+
+pcs constraint order ContentIp then ContentListener
+pcs constraint order ContentListener then ContentInstance
+
+
+##################
+
+
+##################
+#### USERS #######
+pcs resource create UsersIp ocf:heartbeat:IPaddr2 ip=10.6.1.38 cidr_netmask=16 op monitor interval=30s --group Users
+
+pcs resource create  UsersListener ocf:heartbeat:oralsnr params sid="users" user="oracle" \
+  listener="LISTENER_USERS" home=/opt/app/oracle/product/12.1.0/dbhome_1/ \
+  op monitor interval="30s" timeout=30s  op start timeout="120s" op stop timeout="120s" --group Users
+
+pcs resource create UsersInstance ocf:heartbeat:oracle params sid=users user="oracle" \
+     home=/opt/app/oracle/product/12.1.0/dbhome_1/ op monitor interval=120s timeout=30s \
+     op  start timeout="120s" op stop timeout="120s" --group Users
+
+pcs constraint colocation add UsersListener UsersIp INFINITY
+pcs constraint colocation add UsersInstance UsersListener INFINITY
+
+pcs constraint order UsersIp then UsersListener
+pcs constraint order UsersListener then UsersInstance
+
+###################
+
+
+##################
+#### CLASIDEU ####
+
+pcs resource create UsersIp ocf:heartbeat:IPaddr2 ip=10.6.1.40 cidr_netmask=16 op monitor interval=30s --group Clasideu
+
+pcs resource create  ClasideuListener ocf:heartbeat:oralsnr params sid="clasideu" user="oracle" \
+  listener="LISTENER_CLASIDEU" home=/opt/app/oracle/product/12.1.0/dbhome_1/ \
+  op monitor interval="30s" timeout=30s  op start timeout="120s" op stop timeout="120s" --group Clasideu
+
+pcs resource create ClasideuInstance ocf:heartbeat:oracle params sid=clasideu user="oracle" \
+     home=/opt/app/oracle/product/12.1.0/dbhome_1/ op monitor interval=120s timeout=30s \
+     op  start timeout="120s" op stop timeout="120s" --group Clasideu
+
+pcs constraint colocation add ClasideuListener ClasideuIp INFINITY
+pcs constraint colocation add ClasideuInstance ClasideuListener INFINITY
+
+pcs constraint order ClasideuIp then ClasideuListener
+pcs constraint order ClasideuListener then ClasideuInstance
+
+##################
+
+
+##################
+#### EMPLEOS #####
+pcs resource create EmpleosIp ocf:heartbeat:IPaddr2 ip=10.6.1.41 cidr_netmask=16 op monitor interval=30s --group Empleos
+
+pcs resource create EmpleosListener ocf:heartbeat:oralsnr params sid="cvf3" user="oracle" \
+  listener="LISTENER_CVF3" home=/opt/app/oracle/product/12.1.0/dbhome_1/ \
+  op monitor interval="30s" timeout=30s  op start timeout="120s" op stop timeout="120s" --group Empleos
+
+pcs resource create EmpleosInstance ocf:heartbeat:oracle params sid=cvf3 user="oracle" \
+     home=/opt/app/oracle/product/12.1.0/dbhome_1/ op monitor interval=120s timeout=30s \
+     op  start timeout="120s" op stop timeout="120s" --group Empleos
+
+pcs constraint colocation add EmpleosListener EmpleosIp INFINITY
+pcs constraint colocation add EmpleosInstance EmpleosListener INFINITY
+
+pcs constraint order EmpleosIp then EmpleosListener
+pcs constraint order EmpleosListener then EmpleosInstance
+
+###################
+

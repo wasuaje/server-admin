@@ -1,0 +1,150 @@
+# file: publi_app01.yml
+
+- hosts: 204.228.236.15
+  user: root  
+  gather_facts: False
+  vars:   
+  - main_app_home: "/usr/local"
+  - tomcat_port: "80"
+  - tomcat_ip: "204.228.236.22"
+  - cvs_ip: "190.153.52.48"
+  - java_home: "{{main_app_home}}/jdk7"    #necesario porque los prerequisitos andan primero que el seteo de vars
+  - manduca_pass: ""
+  - publica_pass: ""
+  # generado con mkpasswd --method=SHA-512 Cr0n$
+  - crons_pass: "$6$nxYhP3UOFAViEiS$T7FBU22Ew6NtmQ03EmypJ2SrDjHgYOO9PvhWM0yvpo2JLG1YSr5PWGgslfTC2S63agTa5Z1EXNMfCoaQPtqJ4."
+  - provincial_key: "AAAAB3NzaC1yc2EAAAABJQAAAIEAxW+qFjTFPes+Pa14A+7OTgZLJWL775nrBeFt7G65kgEWN192XDFJ90TJT+wOBglDoMPA900C+mZff12OHA6Hj8/JB4YXJybwECjwHJFOYG5yjsrQ2pMkudVYJvJdYEOOeQbxA96EcLH01QfOrV8oGDISImSrmYCCXyH9wPvRz8s="
+  #- java_home: "{{main_app_home}}/jdk7"    #necesario porque los prerequisitos andan primero que el seteo de vars
+  - catalina_home: "{{main_app_home}}/apache-tomcat"
+  - manduca_env:
+      JAVA_HOME: "/usr/local/jdk7"
+      ANT_HOME: "/usr/local/ant"
+      LANG: "es_VE.ISO8859-1"  
+      PATH: "PATH=/usr/lib64/qt-3.3/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/local/jdk7/bin:/usr/local/ant/bin:/home/manduca/bin" 
+  
+  roles:    
+  #prerequisitos 
+   - prerequisitos/java-6u21
+   - prerequisitos/java-6u45
+   - prerequisitos/java-7u51
+   - prerequisitos/java-7u65
+   - prerequisitos/apache-ant
+   - prerequisitos/elastic-0-20-6
+   - prerequisitos/tomcat-755
+   - prerequisitos/resin-3026
+   - prerequisitos/jboss-510   
+   #- publicaciones/es-config
+   #- publicaciones/tomcat-config
+   #- publicaciones/jboss-config
+  
+  # Tareas como tal/
+  tasks:    
+
+    - name: Crear usuario provincial
+      user: name=provincial comment='Usuario provincial para pagos' uid=502 home='/mnt/data01/netapp/clasificados/proyectos/procesos/txt/mispagosprovincial' groups='manduca' 
+      ignore_errors: True
+      tags: prov-user
+
+    - name: Crear usuario crons
+      user: name=crons comment='Usuario Crons para procesos' uid=106 home='/home/crons' groups='manduca'  password={{crons_pass}}
+      ignore_errors: True
+      tags: prov-user    
+ 
+    - name: Actualizar variables de ambiente en /etc/profile (para todos)
+      shell: echo {{item}} >> /etc/profile
+      with_items:
+      - "###### SETEADOS AUTOMATICAMENTE CON ANSIBLE #######"
+      - "export JAVA_HOME=/usr/local/jdk6"
+      - "export RESIN_HOME=/usr/local/resin"
+      - "export ANT_HOME=/usr/local/ant"
+      - "export JBOSS_HOME=/usr/local/jboss"
+      - "export LANG=es_VE.ISO8859-1"
+      - "export PATH=$PATH:$JAVA_HOME/bin:$ANT_HOME/bin"
+      tags: env
+
+    - name: Actualizar wget, curl, nc para que no funcionen
+      shell: mv /usr/bin/{{item.old}} /usr/bin/{{item.new}}
+      with_items:      
+      - {old: 'wget' ,new:'manducaget'}
+      - {old: 'curl' ,new:'manducacurl'}
+      - {old: 'nc'   ,new:'manducanc' }
+      tags: alias
+
+
+    - name: Valores umask para los usuarios
+      shell: echo "umask 002" >> /home/{{item}}/.bash_profile
+      with_items:
+      - "manduca"
+      - "crons"      
+      #- "publicaciones"      
+      tags: umask
+
+
+    - name: Crear Carpetas indexClasificados, indexEmpleos      
+      file: path={{item}}   state=directory owner=manduca group=manduca recurse=yes
+      with_items:
+      - /indexClasificados
+      - /indexEmpleo
+      tags: folders
+
+    - name: Link symbolico java 6
+      file: src={{java_home_6u21}} dest={{main_app_home}}/jdk6 owner=manduca group=manduca state=link
+      ignore_errors: True
+      tags: links
+          
+    - name: Link symbolico java 7
+      file: src={{java_home_7u51}} dest={{main_app_home}}/jdk7 owner=manduca group=manduca state=link
+      ignore_errors: True
+      tags: links
+
+    - name: Link symbolico ant
+      file: src={{ant_home}} dest={{main_app_home}}/ant owner=manduca group=manduca state=link
+      ignore_errors: True
+      tags: links
+
+    - name: Link symbolico Tomcat
+      file: src={{tomcat_dir}} dest={{main_app_home}}/apache-tomcat owner=manduca group=manduca state=link
+      ignore_errors: True
+      tags: links
+
+    - name: Link symbolico elastic search
+      file: src={{es3026_home}} dest={{main_app_home}}/elasticsearch owner=manduca group=manduca state=link
+      ignore_errors: True
+      tags: links
+
+    - name: Link symbolico resin 3-0.26
+      file: src={{resin_home_3026}} dest={{main_app_home}}/resin owner=manduca group=manduca state=link
+      ignore_errors: True
+      tags: links
+
+    - name: Link symbolico jboss 510
+      file: src={{jboss_home_510}} dest={{main_app_home}}/jboss owner=manduca group=manduca state=link
+      ignore_errors: True
+      tags: links
+
+    - name: ImageMagick de repositorio
+      yum: name=ImageMagick state=present
+      ignore_errors: True
+      tags: Im
+
+    - name: configures the setenv.sh script   #lo copio en este paso para respetar los links simbolicos de mas arriba
+      template:
+        src=roles/prerequisitos/tomcat-755/templates/setenv.sh.j2
+        dest="{{tomcat_dir}}/bin/setenv.sh"
+        mode=0755
+      tags: tomcat
+
+    - name: ensures tomcat is restarted
+      shell: "nohup {{tomcat_dir}}/tomcat.sh &"
+      tags: tomcat
+
+    # - name: Directorios simbolico existen y pertenece a manduca      
+    #   file: path= {{ item }}  state=link owner=manduca group=manduca recurse=yes
+    #   with_items:
+    #   - {{main_app_home}}/jboss
+    #   - {{main_app_home}}/resin
+    #   - {{main_app_home}}/elasticsearch
+    #   - {{main_app_home}}/ant
+    #   - {{main_app_home}}/jdk6
+    #   - {{main_app_home}}/jdk7
+    #   tags: manduquea

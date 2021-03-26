@@ -1,0 +1,17 @@
+# file: tomcat-750.yml
+#- hosts: desa-app-edit
+- hosts: all
+  user: root  
+  gather_facts: True
+
+  roles:
+    - llavesRSA.V2
+  vars:
+       #ruta donde se encuentran las llaves 
+    - llave_persona: "/home/allan/Documentos/desarrollo/server-admin/roles/llavesRSA.V2/files"
+    #- ruta_llavero: "/home/allan/Documentos/desarrollo/server-admin/roles/llavesRSA/files"
+   
+#linea de comando:
+#ansible-playbook -i prod -l involta-app llaves-rsa-v2.yml -vvv
+
+#ansible-playbook -i desa -l pelv2prod llaves-rsa-v2.yml -vvv -C

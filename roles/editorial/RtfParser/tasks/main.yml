@@ -1,0 +1,36 @@
+
+# Ansible que instala rtfparser
+
+- name: asegurar que {{local2}} exists
+  file: path="{{local2}}"   state=directory owner=manduca group=manduca recurse=yes
+  tags: cvs
+
+- name:  CVS Loguin {{RtfParser}}
+  shell: cvs -d :pserver:manduca:D3c4r#m6o!A@{{cvs_ip}}:/home/cvs/commons/ login
+  sudo: yes
+  sudo_user: manduca  
+  tags:  cvs
+
+- name:  Checkout del proyecto  {{RtfParser}}
+  command: chdir={{local2}} cvs -d :pserver:manduca@{{cvs_ip}}:/home/cvs/commons checkout {{RtfParser}}
+  sudo: yes
+  sudo_user: manduca  
+  tags: cvs
+
+- name: Reemplazar insertNewsLetters.sh con el template {{RtfParser}}
+  template:
+    src=insertNewsLetters.sh.j2
+    dest="{{local2}}/{{RtfParser}}/conf/insertNewsLetters.sh"
+  sudo: yes
+  sudo_user: manduca  
+  tags: reemp
+
+- name: Reemplazar resin.conf con el template {{RtfParser}}
+  template:
+    src=loadDB.sh.j2
+    dest="{{local2}}/{{RtfParser}}/conf/loadDB.sh"
+  sudo: yes
+  sudo_user: manduca  
+  tags: reemp
+
+

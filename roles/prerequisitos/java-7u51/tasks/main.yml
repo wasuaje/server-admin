@@ -1,0 +1,11 @@
+
+##Este procedimiento solo funciona p
+
+- name: Copio el java 7 a usr local
+  copy: src={{java_pack_7u51}} dest=/usr/local/src
+
+- name: Descomprimir 
+  shell: tar -zxvf /usr/local/src/{{java_pack_7u51}} -C /usr/local
+
+- name: Hacer dueño a manduca
+  shell: chown manduca.manduca -R {{java_home_7u51}}

@@ -1,0 +1,97 @@
+publication.templateForwardUrl=http://{{ip_publisher}}:{{port_publisher}}/remoteTemplateForward.jsp
+publication.templatePathUri=/templates
+publication.threadPoolSize=40
+publication.threadPoolQueueSize=50
+publication.threadPoolKeepAliveTime=10
+loggin.logRoot=/local2/applications/publisher/logs/pjs
+loggin.patternLayout=%-6p - %d - %m%n
+beanLoaderList=com.manduca.eupublish.publication.db.FileExcelLoader,com.manduca.eupublish.publication.db.JavascriptEspecialLoader,com.manduca.eupublish.publication.db.PageArticleLoader,com.manduca.eupublish.publication.db.ArticleLoader, com.manduca.eupublish.publication.db.BlogLoader, com.manduca.eupublish.publication.db.SummaryArticleLoader, com.manduca.eupublish.publication.db.ClassifiedTreeLoader, com.manduca.eupublish.publication.db.StaticLoader, com.manduca.eupublish.publication.db.PageLoader,com.manduca.eupublish.publication.db.NavCodePageLoader,com.manduca.eupublish.publication.db.MovieLoader,com.manduca.eupublish.publication.db.ResultSetLoader,com.manduca.eupublish.publication.db.ContainerLoader,com.manduca.eupublish.publication.db.Wc06TCXmlLoader,com.manduca.eupublish.publication.db.ArticleAvanceLoader,com.manduca.eupublish.publication.db.Wc06PRXmlLoader,com.manduca.eupublish.publication.db.Wc06SGXmlLoader,com.manduca.eupublish.publication.db.SimpleFileLoader,com.manduca.eupublish.publication.db.ArticuloCVLoader, com.manduca.eupublish.publication.db.OfertaLoader,com.manduca.eupublish.publication.db.CA07TCXmlLoader,com.manduca.eupublish.publication.db.CA07SGXmlLoader, com.manduca.eupublish.publication.db.MicrositeLoader,com.manduca.eupublish.publication.db.clasificadosDEU.BloggerClasificadosLoadaer,com.manduca.eupublish.publication.db.clasificadosDEU.JsonUbicacionBusquedaLoader,com.manduca.eupublish.publication.db.clasificadosDEU.JavascriptEspecialLoader, com.manduca.eupublish.publication.db.PageVirtualLoader
+eupublish.skeleton.page=EU2_PLNT
+
+publication.URL=http://{{ip_publisher}}:{{port_publisher}}/do/runPublishJobRemote?
+publication.URLRefresData=http://{{ip_publisher}}:{{port_publisher}}/do/refreshPublishJobDataRemote?
+publication.URLLogs=http://{{ip_publisher}}:{{port_publisher}}/do/viewPublishJobLog
+#Este url de logDetail es publico es decir no necesita password para usarlo
+publication.URLLogDetail=http://{{ip_publisher}}/logViewer
+mediaServer.thumbnail.publishUri={{ip_media}}:{{port_media}}/reduceImage?image=
+
+
+
+#Migration
+
+datamigration.dump.zipFilePath=/local2/applications/eupublish/dump/dump.zip
+datamigration.dump.zip.unzip.directory=/local2/applications/eupublish/dump
+datamigration.dump.importDump.command=imp parfile=/local2/applications/eupublish/dump/import.par
+
+movie.file.location=/manduca10/local3/eluniversal/movil/movie/movie.txt
+
+publicacion.template.freeMarkerPath=/local2/applications/publisher/root
+
+#Author
+author.photo.photoFilePath.eu3=/manduca10/local3/eluniversal/euroot/images/opinion/
+author.photo.photoFilePath.est=/manduca10/local3/estampas/root/images/authors/
+
+#Channel
+channel.photo.write.eu3=/manduca10/local3/eluniversal/euroot/images/blog
+channel.photo.read.eu3=http://static.eluniversal.com/images/blog
+channel.photo.write.est=/manduca10/local3/estampas/root/images/blog/
+channel.photo.read.est=http://static.estampas.com/images/blog/
+
+#rutas para los css,images,js,flash de Estampas
+#Desde Eupublish
+estampas.images.preview = http://eupublish.eluniversal.com/images/estampas/
+estampas.css.preview = http://eupublish.eluniversal.com/css/estampas/
+estampas.js.preview = http://eupublish.eluniversal.com/js/estampas/
+estampas.flash.preview = http://eupublish.eluniversal.com/flash/estampas/
+#Desde la parte publica
+estampas.images = http://static.estampas.com/images/
+estampas.css = http://static.estampas.com/css/
+estampas.js = http://static.estampas.com/js/
+estampas.flash = http://static.estampas.com/flash/
+
+#Path de Estampas 
+est.root.path=/manduca10/local3/estampas/root/
+est.root.url.static=http://static.estampas.com
+est.root.url.images=http://images.estampas.com
+est.root.url=http://www.estampas.com
+
+#Path de ELUniversal
+eu.root.path=/manduca10/local3/eluniversal/euroot/
+eu.root.url.static=http://static.eluniversal.com
+eu.root.url.images=http://images.eluniversal.com
+eu.root.url=http://www.eluniversal.com
+eu.url.images.cdn=http://cdn.eluniversal.com
+
+eupublish.URL=http://eupublish.eluniversal.com
+eud.updateIndexAuthor=http://www.eluniversal.com/indexSearch/do/index/updateIndexAuthor
+eud.authorSearch.clearCache=http://www.eluniversal.com/search/do/clearCache
+
+#valor de cantidad de caracteres para los nombres de imagenes
+cantidad.caracteres.imagenes=25
+cantidad.caracteres.url.articulos=70
+estampas.sitecode=est
+universal.sitecode=eu3
+cantidad.caracteres.titulo.eluniversal=65
+cantidad.caracteres.titulo.estampas=75
+cantidad.caracteres.nombre.canal=25
+
+#Claves para URL Unico
+est.sufijo.article.imprimible=-imp
+eu3.sufijo.article.imprimible=-imp
+est.root.url.ent=http://www.estampas.com/entretenimiento/
+est.root.url.bym=http://www.estampas.com/belleza-y-moda/
+est.root.url.cym=http://www.estampas.com/cuerpo-y-mente/
+est.root.url.cys=http://www.estampas.com/cocina-y-sabor/
+est.root.url.hye=http://www.estampas.com/hogar-y-estilo/
+est.root.url.gds=http://www.estampas.com/guiadeservicios/
+
+url.concurso.json.participation=http://admin.eluniversal.com/concursos/json-participation
+url.concurso.vote=http://admin.eluniversal.com/concursos/vote.action
+google.apikey=AIzaSyABp1-KMtkn2PvR7tHHqP8cUXWL7QTVaZM
+
+#Url del json con la programacion de eutv
+url.json.programacion=http://{{ip_publisher}}:{{port_publisher}}/json-eutv-programacion
+
+#Properties para temas del dia
+cantidad.caracteres.nombre.tema=45
+nombre.tema.raiz=

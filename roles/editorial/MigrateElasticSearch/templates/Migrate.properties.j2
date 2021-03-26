@@ -1,0 +1,14 @@
+datasource.url={{datasourceurl}}
+datasource.user={{datasourceuser}}
+datasource.password={{datasourcepassword}}
+
+search.elasticsearch.host={{searchelasticsearchhost}}
+search.elasticsearch.user={{searchelasticsearchuser}}
+search.elasticsearch.pass={{searchelasticsearchpass}}
+
+smtp.host={{smtphost}}
+
+migrate.error.mail.sender=Procesos-Editoriales@eluniversal.com
+migrate.error.mail.reciver=Sistemas-Editoriales@eluniversal.com
+migrate.error.mail.message=Durante el proceso de indexación de ElasticSearch los siguientes artículos no se pudieron indexar por favor Verficar\n***************\n***articleId***\n***************\n\n{0}\n
+migrate.error.mail.subject=Errores Proceso MigrateToElasticSearch (Verficar {0} artículo/s no Indexado/s).

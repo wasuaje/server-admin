@@ -1,0 +1,31 @@
+# file: common_servers.yml
+- hosts: all
+  user: root  
+  #gather_facts: False #mas rapido desabilitado pero no puedes usar condicionales
+  # lel password created with:
+  # mkpasswd --method=SHA-512 1S6PR'+5K6w1LRI'
+  vars:    
+  - password: $6$LeFfxmL62ZsciD$MMbk9VUtCv3KaSg93XhK3TnD.WD0Tc.Ql5joEXgFdzS8xbiz1.v2pd0.bA03vOMeV8tTnYwNVYG/RPPwsiBe90
+  - cvs_ip: "190.153.52.48"
+  - cvs_host: "cvsserver cvs cvs.eluniversal.com"
+  - main_app_home: "/usr/local"
+
+  roles:
+    #- common    
+    #- prerequisitos/java-7
+    #-  prerequisitos/im-628
+    #-  prerequisitos/apache-ant
+     -  prerequisitos/openresty
+
+# - Una ves recibida la maquina verificar:
+# - Copia tu llave rsa al authorized_keys de la maquina en root
+# para crear el directorio .ssh
+# ssh-keygen
+
+# - Verificar antes lo que va a ejecutar utiliza con - C
+# ansible-playbook -i desa  common_servers.yml  -l db-qa-temp  -vvv -C
+# find /usr/local/ -name "java" | grep bin|grep -v jre |  while read file; do $($file -version); done
+# convert|head -2
+
+# Si algun servicio no arranca al inicio revisar si /etc/init.d/firstboot esta listado en
+# chkconfig --list y apagarlo con chkconfig firstboot off y chkconfig --del firstboot

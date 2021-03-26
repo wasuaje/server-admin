@@ -1,0 +1,9 @@
+#!/bin/bash
+
+pid=`ps -fe | grep '{{tomcat_dir}}' | grep -v grep | tr -s ' ' | cut -d " " -f2`
+
+if [ -n "$pid" ]; then 
+	{{tomcat_dir}}/bin/catalina.sh stop 10 -force
+fi
+
+{{tomcat_dir}}/bin/startup.sh

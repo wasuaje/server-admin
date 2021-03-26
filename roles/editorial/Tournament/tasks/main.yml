@@ -1,0 +1,77 @@
+
+# Ansible que instala tournament
+
+- name: asegurar que {{local2}} exists
+  file: path="{{local2}}"   state=directory owner=manduca group=manduca recurse=yes
+  tags: cvs
+
+- name:  CVS Loguin {{Tournament}}
+  shell: cvs -d :pserver:manduca:D3c4r#m6o!A@{{cvs_ip}}:/home/cvs/commons/ login
+  tags:  cvs
+
+- name:  Checkout del proyecto  {{Tournament}}
+  command: chdir={{local2}} cvs -d :pserver:manduca@{{cvs_ip}}:/home/cvs/commons checkout {{Tournament}}
+  sudo: yes
+  sudo_user: manduca 
+  tags: cvs
+
+- name:  Ant config   {{Tournament}}
+  shell: chdir={{local2}}/{{Tournament}}/conf export LC_ALL=es_VE.ISO8859-1 && ant cvsConfig
+  sudo: yes
+  sudo_user: manduca 
+  environment: manduca_env
+  tags: antconfig
+
+
+- name: Copio libs de DEUutil a {{Tournament}}
+  shell: cp {{local2}}/DEUutil/DEUutil.jar {{local2}}/{{Tournament}}/root/WEB-INF/lib/
+  sudo: yes
+  sudo_user: manduca 
+  tags: copy
+
+- name: Copio libs de SrcCommons a {{Tournament}}
+  shell: cp {{local2}}/srcCommons/srcCommons.jar {{local2}}/{{Tournament}}/root/WEB-INF/lib/
+  sudo: yes
+  sudo_user: manduca 
+  tags: copy
+
+- name: Reemplazar admin.sh con el template {{Tournament}}
+  template:
+    src=admin.sh.j2
+    dest="{{local2}}/{{Tournament}}/conf/admin.sh"
+  sudo: yes
+  sudo_user: manduca 
+  tags: reemp
+
+- name: Reemplazar resinAdmin.conf con el template {{Tournament}}
+  template:
+    src=resinAdmin.conf.j2
+    dest="{{local2}}/{{Tournament}}/conf/resinAdmin.conf"
+  sudo: yes
+  sudo_user: manduca 
+  tags: reemp
+
+- name: Reemplazar buildproperties con el template {{Tournament}}
+  template:
+    src=build.properties.j2
+    dest="{{local2}}/{{Tournament}}/conf/build.properties"
+  sudo: yes
+  sudo_user: manduca 
+  tags: reemp
+  
+- name:  run ant build {{Tournament}}
+  shell: chdir={{local2}}/{{Tournament}}/conf export LC_ALL=es_VE.ISO8859-1 &&  ant build
+  sudo: yes
+  sudo_user: manduca 
+  environment: manduca_env
+  tags: build
+
+
+- name:  run ant buildEU {{Tournament}}
+  shell: chdir={{local2}}/{{Tournament}}/conf export LC_ALL=es_VE.ISO8859-1 &&  ant buildEU
+  sudo: yes
+  sudo_user: manduca
+  environment: manduca_env
+  tags: build
+
+

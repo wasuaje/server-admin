@@ -1,0 +1,63 @@
+
+# Ansible que instala ContestAdmin
+
+
+- name: asegurar que {{local2}} exists
+  file: path="{{local2}}"   state=directory owner=manduca group=manduca recurse=yes
+  tags: cvs
+
+- name:  CVS Loguin {{contestadmin}}
+  shell: cvs -d :pserver:manduca:D3c4r#m6o!A@{{cvs_ip}}:/home/cvs login
+  sudo: yes
+  sudo_user: manduca 
+  tags:  cvs
+
+- name:  Checkout del proyecto  {{contestadmin}}
+  command: chdir={{local2}} cvs -d :pserver:manduca@{{cvs_ip}}:/home/cvs/ checkout -d {{contestadmin}} appDEU/{{contestadmin}}
+  sudo: yes
+  sudo_user: manduca 
+  tags: cvs
+
+- name:  Update -r  del proyecto  {{contestadmin}}
+  command: chdir={{local2}}/{{contestadmin}} cvs update -r PRODUCCION
+  sudo: yes
+  sudo_user: manduca 
+  tags: cvs
+
+- name: Reemplazar context.xml con el template {{contestadmin}}
+  template:
+    src=context.xml.j2
+    dest="{{local2}}/{{contestadmin}}/web/META-INF/context.xml"
+  sudo: yes
+  sudo_user: manduca 
+  tags: reemp
+
+- name: Reemplazar openxava.properties con el template {{contestadmin}}
+  template:
+    src=openxava.properties.j2
+    dest="{{local2}}/{{contestadmin}}/openxava.properties"
+  sudo: yes
+  sudo_user: manduca 
+  tags: reemp
+
+- name: Reemplazar persistence.xml con el template {{contestadmin}}
+  template:
+    src=persistence.xml.j2
+    dest="{{local2}}/{{contestadmin}}/persistence/META-INF/persistence.xml"
+  sudo: yes
+  sudo_user: manduca 
+  tags: reemp
+
+- name:  run ant compile {{contestadmin}}
+  shell: chdir={{local2}}/{{contestadmin}} export LC_ALL=es_VE.ISO8859-1 ; ant compile
+  sudo: yes
+  sudo_user: manduca 
+  environment: manduca_env
+  tags: build
+
+- name:  run ant build {{contestadmin}}
+  shell: chdir={{local2}}/{{contestadmin}} export LC_ALL=es_VE.ISO8859-1 ; ant build
+  sudo: yes
+  sudo_user: manduca 
+  environment: manduca_env
+  tags: build

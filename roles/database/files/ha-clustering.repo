@@ -1,0 +1,5 @@
+[haclustering]
+name=HA Clustering
+baseurl=http://download.opensuse.org/repositories/network:/ha-clustering:/Stable/CentOS_CentOS-6/
+enabled=1
+gpgcheck=0

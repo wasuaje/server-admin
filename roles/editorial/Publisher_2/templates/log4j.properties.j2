@@ -1,0 +1,47 @@
+#produccion
+log4j.rootCategory=ERROR, file
+
+log4j.appender.file=org.apache.log4j.DailyRollingFileAppender
+log4j.appender.file.File=/local2/applications/publisher2/logs/publisher.log
+log4j.appender.file.DatePattern='.'yyyy-MM-dd
+log4j.appender.file.layout=org.apache.log4j.PatternLayout
+log4j.appender.file.layout.ConversionPattern=%-5p %d{HH:mm:ss} %c - %m%n
+
+
+log4j.appender.processAppender=org.apache.log4j.RollingFileAppender
+log4j.appender.processAppender.MaxFileSize=1024KB
+log4j.appender.processAppender.layout=org.apache.log4j.PatternLayout
+log4j.appender.processAppender.layout.ConversionPattern=%-5p %d{HH:mm:ss} %c - %m%n
+log4j.category.processLogger=ERROR
+
+
+# SEGURIDAD
+log4j.appender.securityFile=org.apache.log4j.DailyRollingFileAppender
+log4j.appender.securityFile.File=/local2/applications/publisher2/logs/security.log
+log4j.appender.securityFile.DatePattern='.'yyyy-MM-dd
+log4j.appender.securityFile.layout=org.apache.log4j.PatternLayout
+log4j.appender.securityFile.layout.ConversionPattern=%-5p %d{HH:mm:ss} %c - %m%n
+# %p - %d - %C.%M - %m%n
+
+
+# SQL LOG
+log4j.appender.sqlFile=org.apache.log4j.RollingFileAppender
+log4j.appender.sqlFile.File=/local2/applications/publisher2/logs/sql.log
+log4j.appender.sqlFile.MaxFileSize=1024KB
+log4j.appender.sqlFile.layout=org.apache.log4j.PatternLayout
+log4j.appender.sqlFile.layout.ConversionPattern=%-5p %d{HH:mm:ss} %c - %m%n
+# %p - %d - %C.%M - %m%n
+
+# TEMPLATES
+log4j.appender.templatesFile=org.apache.log4j.RollingFileAppender
+log4j.appender.templatesFile.File=/local2/applications/publisher2/logs/templates.log
+log4j.appender.templatesFile.MaxFileSize=1024KB
+log4j.appender.templatesFile.layout=org.apache.log4j.PatternLayout
+log4j.appender.templatesFile.layout.ConversionPattern=%-5p %d{HH:mm:ss} %c - %m%n
+
+log4j.category.com.manduca.db.SQLHelper=ERROR, sqlFile
+log4j.category.com.manduca.db.SQLHelper=OFF, file
+
+log4j.category.templateLogger=ERROR, templatesFile
+log4j.category.security=ERROR, securityFile
+log4j.category.org.apache=ERROR, file

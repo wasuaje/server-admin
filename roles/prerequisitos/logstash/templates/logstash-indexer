@@ -1,0 +1,63 @@
+#! /bin/sh
+#
+# chkconfig: 345 99 99
+# description: logstash-forwarder
+# processname: logstash-forwarder
+# config: /etc/logstash-forwarder
+
+# Source function library.
+. /etc/init.d/functions
+
+NAME="logstash-indexer"
+DESC="logstash-indexer"
+#PATH=/sbin:/usr/sbin:/bin:/usr/bin
+PIDFILE=/var/run/$NAME.pid
+SCRIPTNAME=/etc/init.d/$NAME
+DAEMON={{lg_home}}/bin/logstash
+DAEMON_ARGS="--config {{lg_home}}/indexer.conf --log $LOG_FILE"
+# logstash log directory
+LOG_DIR=/var/log/logstash
+# logstash configuration directory
+CONF_DIR=/etc/indexer.conf
+# logstash log file
+LOG_FILE=$LOG_DIR/$NAME.log
+
+
+start() {
+        echo -n "Starting $NAME: "
+        daemon --pidfile $PIDFILE "nohup $DAEMON $DAEMON_ARGS >/dev/null 2>&1 &"
+        touch /var/lock/subsys/$NAME
+        #echo $(pidofproc $NAME) > $PIDFILE
+        pgrep -f indexer.conf > $PIDFILE
+        echo
+        return 0
+}
+
+stop() {
+        echo -n "Shutting down $NAME: "
+        killproc -p $PIDFILE
+        rm -f /var/lock/subsys/$NAME
+        echo
+        return 0
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    status)
+        status -p $PIDFILE $NAME
+        ;;
+    restart)
+        stop
+        start
+        ;;
+    *)
+        echo "Usage: service $NAME {start|stop|status|restart}"
+        exit 1
+        ;;
+esac
+exit $?

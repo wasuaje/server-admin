@@ -1,0 +1,5 @@
+#vars for java 5
+
+jboss_pack_510: 'jboss-5.1.0.GA-jdk6.zip'
+
+jboss_home_510: '/usr/local/jboss-5.1.0.GA'

@@ -1,0 +1,23 @@
+#!/bin/bash
+date
+JAVA_HOME="{{java_home_5}}"
+echo $JAVA_HOME
+DAY_FOLDER=/manduca10/local3/eluniversal/euroot/`date '+%Y/%m/%d'`
+MY_CLASSPATH=/local2/applications/rtfparser/bin:/local2/applications/rtfparser/lib/srcCommons.jar:/local2/applications/rtfparser/lib/ojdbc14.jar
+DBPARAMS="-username {{DB_USER}} -password {{DB_PASS}} -host {{DB_SERVER}} -sid {{DB_INSTANCE}}"
+echo $DAY_FOLDER
+
+#ccs
+$JAVA_HOME/bin/java -classpath $MY_CLASSPATH com.manduca.newsletters.Populator -ascii $DAY_FOLDER/nl_ccs.xml -html $DAY_FOLDER/nl_ccs.html -newsletter ccs $DBPARAMS
+#entretenimiento
+$JAVA_HOME/bin/java -classpath $MY_CLASSPATH com.manduca.newsletters.Populator -ascii $DAY_FOLDER/nl_til.xml -html $DAY_FOLDER/nl_til.html -newsletter til $DBPARAMS
+#economia
+$JAVA_HOME/bin/java -classpath $MY_CLASSPATH com.manduca.newsletters.Populator -ascii $DAY_FOLDER/nl_eco.xml -html $DAY_FOLDER/nl_eco.html -newsletter eco $DBPARAMS
+#internacional
+$JAVA_HOME/bin/java -classpath $MY_CLASSPATH com.manduca.newsletters.Populator -ascii $DAY_FOLDER/nl_int.xml -html $DAY_FOLDER/nl_int.html -newsletter int $DBPARAMS
+#deporte
+$JAVA_HOME/bin/java -classpath $MY_CLASSPATH com.manduca.newsletters.Populator -ascii $DAY_FOLDER/nl_dep.xml -html $DAY_FOLDER/nl_dep.html -newsletter dep $DBPARAMS
+#Columnistas
+$JAVA_HOME/bin/java -classpath $MY_CLASSPATH com.manduca.newsletters.Populator -ascii $DAY_FOLDER/nl_opi.xml -html $DAY_FOLDER/nl_opi.html -newsletter opi $DBPARAMS
+#nacional-politica
+$JAVA_HOME/bin/java -classpath $MY_CLASSPATH com.manduca.newsletters.Populator -ascii $DAY_FOLDER/nl_pol.xml -html $DAY_FOLDER/nl_pol.html -newsletter pol $DBPARAMS

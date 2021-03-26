@@ -1,0 +1,67 @@
+---
+
+- name: download Glassfish
+  action: get_url
+      url="{{glassfish_download_url}}"
+      dest="{{glassfish_download_dir}}/{{glassfish_package}}"
+  tags: glassfish
+
+- name: unpacks Glassfish
+  shell: unzip {{glassfish_download_dir}}/{{glassfish_package}} -d {{glassfish_dir}}
+  tags: glassfish
+
+- name: ensures {{glassfish_dir}} exists
+  file: path="{{glassfish_dir}}"   state=directory
+  tags: glassfish
+
+# - name: ensures Glassfish context config folder exists
+#   file:
+#     path="{{glassfish_dir}}/conf/Catalina/localhost"
+#     state=directory
+
+# - name: ensures {{glassfish_log_dir}} exists
+#   file:
+#     path="{{glassfish_log_dir}}"
+#     state=directory
+
+# - name: configures server.xml
+#   template:
+#     src=server.xml.j2
+#     dest="{{glassfish_dir}}/conf/server.xml"
+
+# - name: configures glassfish-users.xml
+#   template:
+#     src="glassfish-users.xml.j2"
+#     dest="{{glassfish_dir}}/conf/glassfish-users.xml"
+
+# - name: configures logging.properties
+#   template:
+#     src="logging.properties.j2"
+#     dest="{{glassfish_dir}}/conf/logging.properties"
+
+# - name: creates glassfish.sh
+#   template:
+#     src="glassfish.sh.j2"
+#     dest="{{glassfish_dir}}/glassfish.sh"
+#     mode=0700
+
+# - name: ensures executable scripts have the right permissions
+#   file:
+#     path="{{glassfish_dir}}/bin/{{item}}"
+#     mode=0755
+#     state=file
+#   ignore_errors: True
+#   with_items:
+#     - startup.sh
+#     - catalina.sh
+#     - shutdown.sh
+
+# - name: configures the setenv.sh script
+#   template:
+#     src=setenv.sh.j2
+#     dest="{{glassfish_dir}}/bin/setenv.sh"
+#     mode=0755
+
+# - name: ensures glassfish is restarted
+#   shell:
+#     "nohup {{glassfish_dir}}/glassfish.sh &"

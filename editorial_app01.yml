@@ -1,0 +1,108 @@
+# file: editorial_app01.yml
+
+- hosts: 204.228.236.14
+  user: root  
+  gather_facts: False 
+  vars: 
+  - ip_service: "204.228.236.21"
+  - main_app_home: "/usr/local"
+  - local2: "/local2/applications/" #por compatibilidad con otros role y para mantenerlos independiente
+  - tomcat_port: "80"
+  - tomcat_ip: "204.228.236.22"
+  - cvs_ip: "190.153.52.48"
+  - java_home: "{{main_app_home}}/jdk6"    #necesario porque los prerequisitos andan primero que el seteo de vars
+  - java_home_5: '/usr/local/jdk1.5.0_22'
+  - java_home_6: '/usr/local/jdk1.6.0_33'
+  - manduca_pass: ""
+  - publica_pass: ""
+  #- java_home: "{{main_app_home}}/jdk7"    #necesario porque los prerequisitos andan primero que el seteo de vars
+  - catalina_home: "{{main_app_home}}/apache-tomcat"
+  - manduca_env:
+      JAVA_HOME: "/usr/local/jdk1.5.0_22"
+      ANT_HOME: "/usr/local/ant"
+      RESIN_HOME: "/usr/local/resin-pro-3.0.21"
+      #RESIN_HOME: "/usr/local/resin-3.0.26"
+      LANG: "es_VE.ISO8859-1"  
+      PATH: "PATH=/usr/lib64/qt-3.3/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/local/ant/bin:/home/manduca/bin" 
+
+  roles:  
+  #prerequisitons los de abajo funcionan
+  - prerequisitos/lib_tlds        #requisito indispensable
+  - prerequisitos/resin-3026
+  - prerequisitos/resin-pro-021
+  - prerequisitos/java-5
+  - prerequisitos/java-6
+  - prerequisitos/apache-ant
+  - prerequisitos/elastic-0-20-6
+  - editorial/DEUutil
+  - editorial/SearchElasticSearch #
+  - editorial/ElasticSearch   #depende de SearchElasticSearch
+  - editorial/ApiSearchElasticSearch
+  - editorial/SrcCommons   # requiere resin pro
+  - editorial/MigrateElasticSearch # depende de srccommons
+  - editorial/MediaServer #
+  - editorial/RtfParser
+  - editorial/Tournament    
+  - prerequisitos/tomcat-6035  
+  - editorial/AjaxConnection    #pide para ant config usuario clave manduca
+  - editorial/Registro  #sigue fallanado
+  - editorial/Poll
+  - editorial/Admin
+  - editorial/DinamicoEU    
+  - editorial/DinamicoEST
+  - editorial/Publisher_1
+  - editorial/Publisher_2  
+  - editorial/CronScripts
+
+  tasks:
+
+    - name: ImageMagick de repositorio
+      yum: name=ImageMagick state=present
+      ignore_errors: True
+      tags: Im
+
+    - name: Actualizar variables de ambiente en /etc/profile (para todos)
+      shell: echo {{item}} >> /etc/profile
+      with_items:
+      - "###### SETEADOS AUTOMATICAMENTE CON ANSIBLE #######"
+      - "export JAVA_HOME=/usr/local/jdk5"
+      - "export RESIN_HOME=/usr/local/resin"
+      - "export ANT_HOME=/usr/local/ant"      
+      - "export LANG=es_VE.ISO8859-1"
+      - "export PATH=$PATH:/usr/local/ant/bin:/usr/local/jdk5/bin"
+      tags: env
+
+    - name: Link symbolico java 5
+      file: src={{java_home_5}} dest={{main_app_home}}/jdk5 owner=manduca group=manduca state=link
+      ignore_errors: True
+      tags: links
+          
+    - name: Link symbolico java 6
+      file: src={{java_home_6}} dest={{main_app_home}}/jdk6 owner=manduca group=manduca state=link
+      ignore_errors: True
+      tags: links
+
+    - name: Link symbolico ant
+      file: src={{ant_home}} dest={{main_app_home}}/ant owner=manduca group=manduca state=link
+      tags: links
+
+    - name: Link symbolico resin 3-0.26
+      file: src={{resin_home_3026}} dest={{main_app_home}}/resin owner=manduca group=manduca state=link
+      ignore_errors: True
+      tags: links
+
+    - name: Link symbolico Tomcat
+      file: src={{tomcat_dir}} dest={{main_app_home}}/apache-tomcat owner=manduca group=manduca state=link
+      ignore_errors: True
+      tags: links
+
+    - name: configures the setenv.sh script   #lo copio en este paso para respetar los links simbolicos de mas arriba
+      template:
+        src=roles/prerequisitos/tomcat-6035/templates/setenv.sh.j2
+        dest="{{tomcat_dir}}/bin/setenv.sh"
+        mode=0755
+      tags: tomcat
+
+    - name: ensures tomcat is restarted
+      shell: "nohup {{tomcat_dir}}/tomcat.sh &"
+      tags: tomcat

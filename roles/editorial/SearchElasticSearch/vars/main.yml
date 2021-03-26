@@ -1,0 +1,14 @@
+
+---
+# vars file for gs
+resin_home: "/usr/local/resin-pro-3.0.21/"
+java_home_6: "/usr/local/jdk1.6.0_33"
+
+ip_app: "{{ ip_service }}"
+port_app: "8484"
+
+ip_elasticSearch: "{{ ip_service }}"
+port_elasticSearch: "9393"
+cluster_elasticSearch: "eluniversal"
+
+SearchElasticSearch: "SearchElasticSearch"

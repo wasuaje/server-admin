@@ -1,0 +1,339 @@
+
+# Creo los grupos que necesita Oracle
+- name: Crear grupo dba
+  group: name=dba state=present gid=1004
+  tags: oracle-user
+
+- name: Crear grupo Orainst
+  group: name=oinstall state=present gid=1005
+  tags: oracle-user
+
+- name: Crear usuario Oracle
+  user: name=oracle comment='Oracle User' uid=104 home='/home/oracle' groups='oinstall,dba'  password={{password}}
+  tags: oracle-user
+
+ #################################################
+ # Ojo modificar aca cuando varie en produccion  #
+ #                                               #
+
+- name: Crear Directorios de instalacion y data de Oracle
+  shell: mkdir -p /opt/app/oracle 
+  tags: oracle-user  
+
+
+ #################################################
+ # Ojo modificar aca cuando varie en produccion  #
+ #                                               #
+- name: Permisos directorio data e instalacion Oracle
+  shell: chown -R oracle.oinstall /mnt/data /mnt/data_old /opt/app /opt/app/oracle 
+  ignore_errors: True
+  tags: oracle-user
+
+- name: Directorio .ssh existe
+  file: path="/home/oracle/.ssh"   state=directory
+  tags: oracle-user
+
+- name: Copio llavero de BBDD a la maquina
+  copy: src=authorized_keys dest=/home/oracle/.ssh/authorized_keys
+  tags: oracle-user
+
+ #Ojo modificar aca cuando varie en produccion
+- name: Permisos directorio data e instalacion Oracle
+  shell: chown -R oracle.oracle /home/oracle
+  tags: oracle-user
+
+- name: Instalar Prerequisitos de Oracle
+  yum: name={{ item }} state=present
+  with_items: 
+  #- htop  
+  - elfutils-libelf
+  - elfutils-libelf-devel
+  - libaio
+  - libaio-devel
+  - setarch  
+  - ksh
+  - binutils 
+  - cpp 
+  - glibc-common
+  - glibc-devel
+  - glibc-headers
+  - gcc-c++
+  - libgomp
+  - numactl
+  - unixODBC
+  - unixODBC-devel
+  - compat-libstdc++*
+  - libXi
+  - libXtst
+  - compat-libcap1
+  - nfs-utils
+  #- fence-agents
+  #- pacemaker
+  #- cman
+  #- pcs
+  #- ccs
+  #- resource-agents
+  tags: oracle-utils
+  ignore_errors: True
+
+- name: Reposirotio EPEL para instalar HTOP  y htop(6)
+  shell: rpm -Uvh http://download3.fedora.redhat.com/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm  && yum install -y htop
+  tags: oracle-utils
+  ignore_errors: True
+  when: ansible_distribution_major_version|int == 6
+
+- name: Reposirotio EPEL para instalar HTOP  (7)
+  shell: rpm -Uvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-2.noarch.rpm && yum install -y htop
+  tags: oracle-utils
+  ignore_errors: True
+  when: ansible_distribution_major_version|int == 7
+
+- name: Detener service iptables RHEL 6
+  shell: chkconfig iptables on && service iptables stop
+  when: ansible_distribution_major_version|int == 6
+  tags: desktop
+  
+- name: COpiar Parametros del Kernell para Oracle
+  copy: src=oracle-sysctl.conf dest=/etc/oracle-sysctl.conf 
+  tags: oracle-kernel
+
+- name: Copiar Parametros del Kernell para Oracle Limits.conf
+  copy: src=oracle-limits.conf dest=/etc/security/oracle-limits.conf 
+  tags: oracle-kernel
+
+- name: Eliminar valores que se duplican kernel.shmmax en /etc/sysctl.conf
+  shell: sed -i s/kernel\.shmmax.*$//g /etc/sysctl.conf
+  tags: oracle-kernel
+  ignore_errors: True  
+
+- name: Eliminar valores que se duplican net.core.wmem_max
+  shell: sed -i s/net\.core\.wmem\_max.*$//g /etc/sysctl.conf en /etc/sysctl.conf
+  tags: oracle-kernel  
+  ignore_errors: True
+
+- name: Setear Parametros del Kernell para Oracle Limits.conf
+  shell: cat /etc/security/oracle-limits.conf >> /etc/security/limits.conf 
+  tags: oracle-kernel  
+
+- name: Setear Parametros del Kernell para Oracle Limits.conf
+  shell: cat /etc/oracle-sysctl.conf >> /etc/sysctl.conf 
+  tags: oracle-kernel  
+
+- name: Elimino valores no reconocidos por ORacle net.bridges
+  shell: sed -i s/^net\.bridge\.bridge.*$//g /etc/sysctl.conf
+  tags: oracle-kernel
+  ignore_errors: True
+
+- name: Hacer cambios funcionar Sysctl y Limits
+  shell: sysctl -p
+  tags: oracle-kernel
+  ignore_errors: True
+
+
+
+# - name: Copiar software oracle 12c
+#   copy: src={{item}} dest=/home/oracle/ 
+#   with_items:
+#   - linuxamd64_12c_database_1of2.zip
+#   - linuxamd64_12c_database_2of2.zip    
+#   tags: oracle-soft
+
+# - name: Descomprimir Software Oracle 1/2
+#   shell: user=oracle chdir=/home/oracle/ unzip linuxamd64_12c_database_1of2.zip -d /home/oracle/linuxamd64_12c_database 
+#   tags: oracle-soft
+
+# - name: Descomprimir Software Oracle 2/2
+#   shell: user=oracle chdir=/home/oracle/ unzip linuxamd64_12c_database_2of2.zip -d /home/oracle/linuxamd64_12c_database 
+#   tags: oracle-soft
+
+# - name: Copia de response file a /home/oracle
+#   copy: src=dbinstall.rsp dest=/home/oracle/dbinstall.rsp 
+#   tags: oracle-soft
+
+# - name: Me aseguro q response file a pertenezca a oracle
+#   file: path=/home/oracle/dbinstall.rsp state=file owner=oracle group=oinstall 
+#   tags: oracle-soft
+#   ignore_errors: True
+
+# - name: Me aseguro directorio descomprimido pertenezca a oracle
+#   file: path=/home/oracle/linuxamd64_12c_database state=directory owner=oracle group=oracle recurse=yes
+#   tags: oracle-soft
+
+# - name: Ejecutar instalacion en si
+#   command: /home/oracle/linuxamd64_12c_database/database/runInstaller -silent -noconfig -responseFile /home/oracle/dbinstall.rsp
+#   su: yes
+#   su_user: oracle
+#   tags: oracle-soft2
+
+# #- name: Link symbolico provisional
+# #  file: src=/home/data/oracle dest=/mnt/data owner=oracle group=oinstall state=link
+# #  tags: oracle-soft
+
+# - name: variables de ambiente
+#   shell: echo {{ item }} >> /home/oracle/.bash_profile
+#   with_items:
+#   - "export ORACLE_HOME=/opt/app/oracle/product/12.1.0/dbhome_1"
+#   - "export PATH=$PATH:/opt/app/oracle/product/12.1.0/dbhome_1/bin"  
+#   tags: oracle-soft
+
+#   ##########################################################
+#   ### Falla en la sig. tarea Instalacion no finalizada #####
+#   ### Hay que reanudar aqui                            #####
+
+# - name: ejecutar root.sh para terminar la instalacion en si
+#   shell: /opt/app/oracle/product/12.1.0/dbhome_1/root.sh
+#   tags: oracle-final
+
+# # - name: Copia de response file de content /home/oracle
+# #   copy: src=content.dbc dest=/home/oracle/content.dbc
+# #   tags: content
+
+# # - name: Me aseguro q response file content.dbc a pertenezca a oracle
+# #   file: path=/home/oracle/content.dbc state=file owner=oracle group=oinstall 
+# #   tags: content
+# #   ignore_errors: True
+
+# - name: ejecutar variables
+#   shell: source /home/oracle/.bash_profile
+#   tags: content
+
+# # - name: Copio y descomprimo content.tar.gz
+# #   unarchive: src=content.tar.gz dest=/home/oracle copy=yes 
+# #   tags: content
+
+# # - name: reemplazo de cadena opt/app/oracle/producto.... por /home/oracle/scr/ en archivo descomprimido
+# #   shell: sed -i 's/\/opt\/app\/oracle\/product\/12.1.0\/dbhome_1\/assistants\/dbca\/templates\/scr/\/home\/oracle\/scr/g' /home/oracle/scr/*
+# #   tags: content  
+
+# # - name: ejecutar instalacion de la instancia Content
+# #   shell: echo -e 'sysprueba\nsystemprueba\n' | /home/oracle/scr/content.sh
+# #   tags: content
+# #   environment: oracle_env
+# #   su: yes
+# #   su_user: oracle
+
+- name: Instalar Todos los paquetes para Xwindows,Desktop, Gedit, Y Vnc-server package group CENTOS/RHEL 6
+  yum: name="{{ item }}" state=present
+  with_items:
+  - "@X Window System"
+  - "@Desktop"
+  - gedit 
+  - tigervnc-server
+  when: ansible_distribution_major_version|int == 6
+  tags: desktop
+
+- name: Instalar Todos los paquetes para Xwindows,Desktop, Gedit, Y Vnc-server package group CENTOS/RHEL 7
+  shell: yum groupinstall -y GNOME Desktop Graphical Administration Tools && yum install -y xorg-x11-fonts-Type1 gedit tigervnc-server 
+  when: ansible_distribution_major_version|int == 7
+  tags: desktop
+
+- name: Setear Inicio con sesion grafica
+  shell: sed -i s/\:3/\:5/g  /etc/inittab 
+  when: ansible_distribution_major_version|int == 6
+  tags: desktop
+
+- name: Deshabilitar pluginconf para evitar error autenticacion root
+  shell: sed -i s/enabled\=1/enabled\=0/g /etc/yum/pluginconf.d/refresh-packagekit.conf
+  when: ansible_distribution_major_version|int == 6
+  tags: desktop
+
+- name: Copio configuraciones de VNC
+  copy: src=vncservers dest=/etc/sysconfig/vncservers-oracle
+  when: ansible_distribution_major_version|int == 6
+  tags: desktop  
+
+- name: Agrego mi configuracion de vnc personal a /etc/sysconfig/vncservers 
+  shell: cat /etc/sysconfig/vncservers-oracle >> /etc/sysconfig/vncservers
+  when: ansible_distribution_major_version|int == 6
+  tags: desktop
+
+- name: vncpasswd para  oracle
+  command: su oracle -c "echo -e 'Agu1l4\nAgu1l4\n' | vncpasswd"
+  tags: desktop
+
+- name: vncpasswd para root
+  shell: echo -e "B4rc3l0n4!\nB4rc3l0n4!\n"| vncpasswd
+  tags: desktop
+
+- name: Start VNC service RHEL 6
+  shell: chkconfig vncserver on && service vncserver start
+  when: ansible_distribution_major_version|int == 6
+  tags: desktop
+
+- name: Configure VNC service RHEL 7
+  copy: src=vncservers7 dest=/etc/systemd/system/vncserver@:2.service
+  tags: desktop
+  when: ansible_distribution_major_version|int == 7
+
+- name: Firewall VNC add RHEL 7
+  shell: firewall-cmd --permanent --zone=public --add-port=5902/tcp && firewall-cmd --reload
+  tags: desktop
+  when: ansible_distribution_major_version|int == 7  
+
+- name: Start VNC service RHEL 7
+  shell: systemctl daemon-reload && systemctl enable vncserver@:2.service && systemctl start vncserver@:2.service 
+  tags: desktop
+  when: ansible_distribution_major_version|int == 7
+
+#Documentacion 
+# OL7 http://clusterlabs.org/doc/en-US/Pacemaker/1.1-pcs/html-single/Clusters_from_Scratch/index.html#_cluster_software_installation
+# Ol6.5 http://clusterlabs.org/doc/en-US/Pacemaker/1.1-plugin/html-single/Clusters_from_Scratch/index.html#_os_installation
+# OL6 Usar apartado con CMAN 
+
+# - name: Install Corosync, Pacemaker and pcs
+#   yum: name="{{ item }}" state=present
+#   with_items:
+#   - pacemaker
+#   - pcs
+#   - corosync
+#   - cman 
+#   - gfs2-utils 
+#   - gfs2-cluster
+#   when: ansible_distribution_major_version|int == 6
+#   tags: cluster
+
+
+# - name: Install Corosync, Pacemaker and pcs
+#   yum: name="{{ item }}" state=present
+#   with_items:
+#   - pcs
+#   - pacemaker
+#   when: ansible_distribution_major_version|int == 7
+#   tags: cluster
+
+
+
+#"ansible_distribution_major_version" "7"
+#- name: Instalar repositorio de HA Clustering
+#  copy: src=ha-clustering.repo dest=/etc/yum.repos.d/ha-clustering.repo
+#  tags: oracle-cluster
+
+#- name: Install Corosync, Pacemaker and CRM Shell.
+#  shell: yum install pacemaker corosync crmsh -y
+#  tags: oracle-cluster
+
+#- name: Copiar Archivo de configuracion Corosync
+#  copy: src=corosync.conf dest=/etc/corosync.conf
+#  tags: oracle-cluster
+
+#- name: Corosync Keygen
+#  shell: corosync-keygen
+#  tags: oracle-cluster
+
+#- name: Corosync copy Keygen to another node
+#  command: scp root@204.228.236.44:/etc/corosync/authkey /home/wasuaje/Documentos/desarrollo/server-admin/roles/database/files/
+#  delegate_to: 127.0.0.1
+#  tags: oracle-cluster
+
+#- name: Copiar authkey hacia segundo nodo
+#  command: scp /home/wasuaje/Documentos/desarrollo/server-admin/roles/database/files/authkey root@204.228.236.45:/etc/corosync/
+#  delegate_to: 127.0.0.1
+#  tags: oracle-cluster
+
+#- name: Start corosync
+#  shell: service corosync start
+#  tags: oracle-cluster 
+
+#- name: Start pacemaker
+#  shell: service pacemaker start
+#  tags: oracle-cluster 

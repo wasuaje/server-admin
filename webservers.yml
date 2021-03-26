@@ -1,0 +1,27 @@
+---
+# file: webservers.yml
+- hosts: all
+  user: root  
+  roles:
+    - common
+
+- hosts: anunciantes
+  user: root  
+  roles:
+    - common
+    - anunciantes
+  vars:
+    # created with:
+    # mkpasswd --method=SHA-512 Agu1l4
+   anun_mysql_pass: 05424073a64dc8248e37c1e938e3114c
+   anun_mysql_user: anunciantes@localhost
+   anun_mysql_db: anunciantes
+   nuzz_mysql_pass: 38b1ccd1bc96a7ce894afea67f5d3f37
+   nuzz_mysql_user: nuzztap@localhost
+   nuzz_mysql_db: nuzztap
+   apache_ip: 192.168.1.1
+   apache_port: 80
+   apache_doc: /mnt/anunciantes/root
+   anun_doc: /mnt/anunciantes/root
+   nuzz_doc: /mnt/nuzztap/root
+   data_root: /mnt

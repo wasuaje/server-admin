@@ -1,0 +1,12 @@
+# file: tomcat-750.yml
+#- hosts: desa-app-edit
+- hosts: all
+  user: root  
+  roles:
+    - llavesRSA
+  vars:
+    - llave_persona: "mariadelosangeles.pub"
+
+
+#Ejecutese asi 
+# ansible-playbook -i prod  -l involta-manduca llaves-rsa.yml -C

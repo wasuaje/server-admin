@@ -1,0 +1,20 @@
+
+# Ansible que instala la OpenXavaFramework
+
+
+- name: asegurar que {{local2}} exists
+  file: path="{{local2}}"   state=directory owner=manduca group=manduca recurse=yes
+  tags: cvs
+
+- name:  CVS Loguin OpenXavaFramework
+  shell: cvs -d :pserver:manduca:D3c4r#m6o!A@{{cvs_ip}}:/home/cvs  login
+  sudo: yes
+  sudo_user: manduca    
+  tags:  cvs
+
+- name:  Checkout del proyecto  OpenXavaFramework
+  command: chdir={{local2}} cvs -d :pserver:manduca@{{cvs_ip}}:/home/cvs checkout -d OpenXavaFramework appDEU/OpenXavaFramework
+  sudo: yes
+  sudo_user: manduca    
+  tags: cvs
+

@@ -1,0 +1,12 @@
+
+- name: Reemplazar jboss-log4j
+  template:
+    src=jboss-log4j.xml.j2
+    dest="{{jboss_dir}}/server/default/conf/jboss-log4j.xml"
+  tags: jboss-config
+
+- name: Reemplazar server-xml
+  template:
+    src=server.xml.j2
+    dest="{{jboss_dir}}/server/default/deploy/jbossweb.sar/server.xml"
+  tags: jboss-config

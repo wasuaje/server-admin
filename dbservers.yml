@@ -1,0 +1,68 @@
+# file: appservers.yml
+- hosts: all
+  user: root  
+  #gather_facts: False #mas rapido desabilitado pero no puedes usar condicionales
+  # lel password created with:
+  # mkpasswd --method=SHA-512 Agu1l4
+  vars:    
+  - password: $6$FSeIg3IgKyZ6w$UEOAxSrMXN2SA3tpiKKdu1cFnfUH1tB/iwxx7xhQPKN4YZcKoWO./v7QTFk0VVdzn0EMCYf8i8337AGz3BzSc.
+  - oracle_env:
+       ORACLE_HOME: "/opt/app/oracle/product/12.1.0/dbhome_1"
+       PATH: "/sbin:/usr/sbin:/usr/local/sbin:/bin:/usr/bin:/usr/local/bin:/usr/ccs/bin:/usr/openwin/bin:/opt/app/oracle/product/12.1.0/dbhome_1/bin"
+       ORACLE_BASE: "/opt/app/oracle"
+       ORACLE_HOSTNAME: "entclus01"
+  - dbca: /opt/app/oracle/product/12.1.0/dbhome_1/bin/dbca
+  roles:    
+    - database
+
+
+# - Una ves recibida la maquina verificar:
+# - Copia tu llave rsa al authorized_keys de la maquina en root
+
+# SI no se desea copiar la llave y se conoce el pass de root ejecutar con
+#  
+# -  ansible-playbook -i desa  dbservers.yml  -l db-qa-temp  -C -vvvv -u root -k
+
+# El tmpfs en /etc/fstab debe ser igual a la ram al menos y mayor a 6 para 4 instancias, ejemplo;
+# tmpfs                   /dev/shm                tmpfs   defaults,size=6g       0 0
+
+# - La memoria swap debe ser igual a la ram (Oracle lunix lo hace por defecto, Centos NO)
+
+# - Si no hablitas la red en isntalacion asegurate de colocar en /etc/resolv.conf (VARIA EN PRODUCCION)
+#   nameserver 10.1.3.249 
+#   nameserver 10.1.3.250
+# Asegurese de agregar el nombre del host a /etc/hosts
+# por ejemplo 
+# 127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4 dbqawebcl01.localdomain
+
+# - Asegurate de que el selinux este disabled en /etc/selinux/config ----> REBOOT
+
+#actualice manualmente 
+# yum update -y && yum upgrade -y
+
+# Asegurese de que la maquina a instalar tiene una entrada en los archivos prod o desa dependiendo el caso, ejemplo:
+
+# [DBservers]
+# 204.228.236.xx
+
+# - Normalmente el comando para instalar software e instancia content (siempre verificar primero con  - C al final):
+
+# ansible-playbook -i desa  dbservers.yml  -l db-qa-temp  --skip-tags=kernels,desktop -vvv
+
+# - Si no se va a instalar la instancia por cualquier razon
+
+# ansible-playbook -i desa  dbservers.yml  -l db-qa-temp  --skip-tags=kernels,desktop,content -vvv
+
+# - Verificar antes lo que va a ejecutar utiliza con - C
+
+# ansible-playbook -i desa  dbservers.yml  -l db-qa-temp  --skip-tags=kernels,desktop -vvv -C
+
+# - Va a Fallar en la linea : ejecutar root.sh para terminar la instalacion en si
+#   Debes esperar hasta que termine la instalacion del soft oracle con ps -fea | grep oracle es un proceso java
+
+# - Luego reanudar la instalacion con: (probar primero con -C al final)
+
+#   ansible-playbook -i desa  dbservers.yml  -l db-qa-web  --skip-tags=kernels,desktop --start-at-task="ejecutar root.sh para terminar la instalacion en si" -vvv
+
+#  - Para produccion en cluster:  se requiere yum install OpenIPMI OpenIPMI-tools en cualquiet otra maquina como dispositivo de fence en case de uso de proxy
+

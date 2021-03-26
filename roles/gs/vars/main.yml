@@ -1,0 +1,15 @@
+
+---
+# vars file for gs
+
+ant_home: "/usr/local/apache-ant-1.9.4"
+ant_download_url: "http://mirror.cogentco.com/pub/apache/ant/binaries/apache-ant-1.9.4-bin.tar.gz"
+
+cvs_ip: "190.153.52.48"
+cvs_name: "cvsserver"
+
+main_server_ip: "204.13.51.76"
+
+main_app_home: "/clasificados/proyectos/"
+
+java_home: '/usr/local/jdk1.7.0_60'

@@ -1,0 +1,16 @@
+
+---
+# vars file
+
+#java_home_5: "/usr/local/jdk1.5.0_22"
+
+DB_SERVER: "204.228.236.50"
+DB_INSTANCE: "content"
+DB_USER: "content"
+DB_PASS: "P0nZ0n#0\"\"$\"\"4!"
+DB_PORT: "1521"
+BIN_HOME: "/usr/bin"
+
+DBPARAMS: "-username content -password P0nZ0n#0\"\"$\"\"4! -host 204.228.236.50 -sid content"
+
+RtfParser: "rtfparser"

@@ -1,0 +1,24 @@
+
+
+
+# Ansible que instala cronscripts
+# 
+#
+#
+
+
+- name: asegurar que {{local2}} exists
+  file: path="{{local2}}"   state=directory owner=manduca group=manduca recurse=yes
+  tags: cronscripts
+
+- name:  CVS Loguin {{cronscripts}}
+  shell: cvs -d :pserver:manduca:D3c4r#m6o!A@{{cvs_ip}}:/home/cvs/commons/ login
+  sudo: yes
+  sudo_user: manduca
+  tags:  cronscripts
+
+- name:  Checkout del proyecto  {{cronscripts}}
+  shell: chdir={{local2}} cvs -d :pserver:manduca@{{cvs_ip}}:/home/cvs/commons checkout {{cronscripts}}
+  sudo: yes
+  sudo_user: manduca
+  tags: cronscripts

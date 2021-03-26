@@ -1,0 +1,101 @@
+
+
+
+- name: instala paquetes necesarios
+  yum: name={{ item }} state=present
+  with_items:  
+  - MySQL-python
+  - openssl
+  - openssl-devel 
+  - httpd
+  - httpd-devel
+  - mysql
+  - mysql-server
+  - mysql-devel  
+  - php
+  - php-mysql
+  - php-common
+  - php-gd
+  - php-mcrypt
+  - php-devel
+  - php-xml   
+  - php-bz2  
+  - php-PDO
+  - php-pdo_mysql
+  - php-pdo_sqlite  
+  - php-zip
+  - php-zlib
+  tags: paquetes
+
+
+# Create a new database with name 'bobdata'
+- name: Creando BD Mysql anunciantes
+  mysql_db: name=anunciantes state=present  
+  tags: bds
+
+- name: Creando BD Mysql nuzztap  
+  mysql_db: name=nuzztap     state=present
+  tags: bds
+
+# Copy database dump file to remote host and restore it to database 'my_db'
+- name: Restore de anunciantes
+  copy: src=anunciantes.sql.gz dest=/tmp
+  tags: bds  
+
+- name: Restore de nuzztap
+  copy: src=nuzztap.sql.gz dest=/tmp
+  tags: bds  
+
+- name: Import de anunciantes
+  mysql_db: name={{ anun_mysql_db }} state=import target=/tmp/anunciantes.sql.gz
+  tags: bds  
+
+- name: Import de nuzztap
+  mysql_db: name={{ nuzz_mysql_db }} state=import target=/tmp/nuzztap.sql.gz  
+  tags: bds  
+
+- name: usuario anunciantes
+  mysql_user: name={{ anun_mysql_user }} password={{ anun_mysql_pass }} priv={{ anun_mysql_user }}.localhost:{{ anun_mysql_db }} state=present
+  tags: bds  
+
+- name: usuario nuzztap
+  mysql_user: name={{ nuzz_mysql_user }} password={{ nuzz_mysql_pass }} priv={{ nuzz_mysql_user }}.localhost:{{ nuzz_mysql_db }} state=present
+  tags: bds  
+
+- name: copia template de configuracion apache 
+  template: src=httpd.conf dest=/etc/httpd/conf/httpd.conf owner=root mode=744  
+  tags: apache
+
+- name: copy tar anunciantes
+  copy: src=anunciantes.tar.gz dest=/tmp
+  tags: data
+
+- name: copy tar nuzztap
+  copy: src=anunciantes.tar.gz dest=/tmp
+  tags: data
+
+- name: restore anunciantes
+  shell: tar -zxf /tmp/anunciantes.tar.gz -C {{data/root}}
+  tags: data  
+
+- name: restore nuzztap
+  shell: tar -zxf /tmp/nuzztap.tar.gz -C {{data/root}}
+  tags: data  
+
+- name: Restart Apache
+  action: service name=httpd state=restarted
+  tags: apache
+
+#- name: Configurando Mysql
+#  action: shell {{ items }}
+#  with_items:
+#  - mysqladmin create anunciantes
+#  - mysqladmin create nuzztap
+#  - mysql -u root < create user {{ anun_mysql_user }};
+#  - mysql -u root < SET PASSWORD FOR {{ anun_mysql_user }}@localhost= PASSWORD({{ anun_mysql_pass }});
+#  - mysql -u root < GRANT ALL PRIVILEGES ON {{ anun_mysql_db }} .* TO {{ anun_mysql_user }}@localhost IDENTIFIED BY {{ anun_mysql_pass }};
+
+
+
+
+

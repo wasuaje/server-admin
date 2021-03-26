@@ -1,0 +1,34 @@
+---
+# vars file for tomcat
+glassfish_major_version: '3'
+
+glassfish_minor_version: '1'
+
+glassfish_micro_version: '1'
+
+glassfish_dir: "/usr/local/glassfish-{{glassfish_version}}"
+
+glassfish_version: "{{glassfish_major_version}}.{{glassfish_minor_version}}.{{glassfish_micro_version}}"
+
+glassfish_package: "glassfish-{{glassfish_version}}.zip"
+
+glassfish_download_url: "http://download.java.net/glassfish/3.1.1/release/{{glassfish_package}}"
+
+glassfish_download_dir: "/usr/local/src"
+
+glassfish_log_level: "FINE"
+
+glassfish_log_dir: "{{glassfish_dir}}/logs"
+
+glassfish_log_limit: 1024
+
+glassfish_shutdown_port: 6005
+
+glassfish_ajp_port: 6009
+
+glassfish_redirect_port: 6443
+
+#in milisseconds
+glassfish_connection_timeout: 20000
+
+glassfish_users: [ { name: 'tomcat', password: 'tomcat', roles: 'tomcat,admin-gui'}]

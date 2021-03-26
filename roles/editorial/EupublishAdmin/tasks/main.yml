@@ -1,0 +1,64 @@
+
+# Ansible que instala EUpublishAdmin
+
+
+- name: asegurar que {{local2}} exists
+  file: path="{{local2}}"   state=directory
+  tags: cvs
+
+- name:  CVS Loguin {{eupadmin}}
+  shell: cvs -d :pserver:manduca:D3c4r#m6o!A@{{cvs_ip}}:/home/cvs login
+  sudo: yes
+  sudo_user: manduca
+  tags:  cvs
+
+- name:  Checkout del proyecto  {{eupadmin}}
+  command: chdir={{local2}} cvs -d :pserver:manduca@{{cvs_ip}}:/home/cvs/ checkout -d {{eupadmin}} appDEU/{{eupadmin}}
+  sudo: yes
+  sudo_user: manduca
+  tags: cvs
+
+- name:  Update -r  del proyecto  {{eupadmin}}
+  command: chdir={{local2}}/{{eupadmin}} cvs update -r PRODUCCION
+  sudo: yes
+  sudo_user: manduca
+  tags: cvs
+
+
+- name: Reemplazar context.xml con el template {{eupadmin}}
+  template:
+    src=context.xml.j2
+    dest="{{local2}}/{{eupadmin}}/web/META-INF/context.xml"
+  sudo: yes
+  sudo_user: manduca
+  tags: reemp
+
+- name: Reemplazar openxava.properties con el template {{eupadmin}}
+  template:
+    src=openxava.properties.j2
+    dest="{{local2}}/{{eupadmin}}/openxava.properties"
+  sudo: yes
+  sudo_user: manduca
+  tags: reemp
+
+- name: Reemplazar persistence.xml con el template {{eupadmin}}
+  template:
+    src=persistence.xml.j2
+    dest="{{local2}}/{{eupadmin}}/persistence/META-INF/persistence.xml"
+  sudo: yes
+  sudo_user: manduca
+  tags: reemp
+
+- name:  run ant compile {{eupadmin}}
+  command: chdir={{local2}}/{{eupadmin}} ant compile
+  sudo: yes
+  sudo_user: manduca
+  environment: manduca_env
+  tags: build
+
+- name:  run ant build {{eupadmin}}
+  command: chdir={{local2}}/{{eupadmin}} ant build
+  sudo: yes
+  sudo_user: manduca
+  environment: manduca_env
+  tags: build

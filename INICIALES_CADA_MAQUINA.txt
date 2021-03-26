@@ -1,0 +1,3 @@
+python-setuptools
+easy_install simplejson
+#copiar llave a authorizaed_keys

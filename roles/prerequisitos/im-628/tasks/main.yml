@@ -1,0 +1,35 @@
+
+##Este procedimiento solo funciona p
+
+
+- name: ImageMagick jpeg support    
+  yum: name={{ item }} state=present
+  with_items:     
+  - libjpeg
+  - libjpeg-devel      
+  tags: img-magic
+  ignore_errors: True
+
+#- name: Copio el imagemagick a usr local src
+#  copy: src={{im_pack_6288}} dest=/usr/local/src
+#  tags: img-magic
+
+#- name: Descargo el paquete
+#  shell: chdir=/usr/local/src wget http://mirrors-usa.go-parts.com/mirrors/ImageMagick/ImageMagick-6.9.0-3.tar.gz
+#  tags: img-magic  
+
+- name: Descomprimir imagemagick
+  shell: tar -zxvf /usr/local/src/{{im_pack}} -C /usr/local/src
+  tags: img-magic
+
+- name: Ejecutar script de configuracion de imagemagick
+  shell: chdir={{im_src}}  ./configure --prefix={{im_home}}
+  tags: img-magic
+
+- name: Ejecutar compilacion e instalacion
+  shell: chdir={{im_src}}  make -j4 && make install -j4
+  tags: img-magic
+
+#- name: Hacer dueño a manduca carpeta imagemagick
+#  shell: chown publicaciones.manduca -R {{im_home_6288}}
+#  tags: img-magic

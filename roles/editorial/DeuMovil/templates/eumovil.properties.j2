@@ -1,0 +1,67 @@
+#Archivo de configuracion WebMovil. Enquis Techonologies 2010 version 1.0
+
+#Configuracion principal
+com.enquis.universal.url=static.eluniversal.com
+rss.url.path=/xmlmovil
+conf.path=/WEB-INF/conf
+img.path=img
+
+#MEMCACHE - Servidor Memcache
+com.enquis.cache.addressPort={{memcache_server}}
+net.spy.log.LoggerImpl=net.spy.memcached.compat.log.Log4JLogger
+
+# El tiempo se mide en segundos
+com.enquis.cache.timeToLive.default=60
+com.enquis.cache.timeToLive.article=600
+com.enquis.cache.timeToLive.home=60
+#com.enquis.cache.timeToLive.section=300 no esta siendo usado en el codigo
+
+#en segundos NO DEBE SER MENOR A 4 SEGUNDOS.
+com.enquis.cache.timeout=5
+
+#Numero maximo concurrentes de conexiones a memcache
+com.enquis.pool.capacity=150
+
+#Nombre del namespace de memcache
+com.enquis.pool.cache.namespace={{memcache_namespace}}
+                                    
+#formato de fecha
+com.enquis.date.format=_yyyy_MM_dd
+
+#Medidas de Banner
+#com.enquis.banner.message=eluniversal.com
+
+# -- charset
+charset=UTF8
+
+#Log4j.properties para	webMovil version 1.0
+
+#org.apache.catalina.level=WARNING
+
+log4j.debug=true
+
+log4j.rootLogger=WARN, logfileWarn,  stdout
+#log4j.rootCategory=DEBUG, logfileWarn,  stdout
+
+log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+log4j.appender.stdout.Threshold=DEBUG
+log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+log4j.appender.stdout.layout.ConversionPattern=%d %p [%c] - <%m>%n
+
+log4j.appender.logfileDebug=org.apache.log4j.RollingFileAppender
+log4j.appender.logfileDebug.Threshold=DEBUG
+log4j.appender.logfileDebug.File=logs/eu-debug.log
+log4j.appender.logfileDebug.MaxFileSize=500MB
+log4j.appender.logfileDebug.MaxBackupIndex=3
+log4j.appender.logfileDebug.layout=org.apache.log4j.PatternLayout
+log4j.appender.logfileDebug.layout.ConversionPattern=%d %-7.7p %-54.54c : %m : %F %L%n
+
+log4j.appender.logfileWarn=org.apache.log4j.RollingFileAppender
+log4j.appender.logfileWarn.Threshold=WARN
+log4j.appender.logfileWarn.File=logs/eu-warn.log
+log4j.appender.logfileWarn.MaxFileSize=1000MB
+log4j.appender.logfileWarn.MaxBackupIndex=3
+log4j.appender.logfileWarn.layout=org.apache.log4j.PatternLayout
+log4j.appender.logfileWarn.layout.ConversionPattern=%d %-7.7p %-54.54c : %m : %F %L%n
+
+log4j.disable=INFO

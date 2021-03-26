@@ -1,0 +1,9 @@
+
+[pelv2]
+10.1.5.234
+
+[130]
+10.3.0.199 #falsa para no tocarlos por error
+
+[dbprodlocal]
+10.6.1.11

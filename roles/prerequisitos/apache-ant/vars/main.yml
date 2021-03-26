@@ -1,0 +1,3 @@
+
+ant_home: "/usr/local/apache-ant-1.9.4"
+ant_download_url: "http://mirror.cogentco.com/pub/apache/ant/binaries/apache-ant-1.9.4-bin.tar.gz"

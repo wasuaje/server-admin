@@ -1,0 +1,15 @@
+---
+# plays common across all servers
+
+#Copio el archivo de llaves a su lugar
+# CAMBIAR EL NOMBRE DE LA PERSONA EN EL A PRINCIPAL DEL ROL
+- name: Copiando llavero de la persona seleccionada a /home/manduca/.ssh {{llave_persona}}
+  copy: src={{llave_persona}} dest=/home/manduca/.ssh/
+  tags: copia
+
+- name: Agrego la llave a authorized_keys {{llave_persona}}
+  shell: cat /home/manduca/.ssh/{{llave_persona}} >> /home/manduca/.ssh/authorized_keys
+  tags: agrega
+
+- name: elimina archivo temporal {{llave_persona}}
+  file: path="/home/manduca/.ssh/{{llave_persona}}" state=absent

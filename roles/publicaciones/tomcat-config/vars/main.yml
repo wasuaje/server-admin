@@ -1,0 +1,35 @@
+---
+# vars file for tomcat
+tomcat_dir: '/usr/local/apache-tomcat'
+
+tomcat_major_version: '7'
+
+tomcat_minor_version: '0'
+
+tomcat_micro_version: '55'
+
+tomcat_version: "{{tomcat_major_version}}.{{tomcat_minor_version}}.{{tomcat_micro_version}}"
+
+tomcat_package: 'apache-tomcat-{{tomcat_version}}.tar.gz'
+
+tomcat_download_url: "http://archive.apache.org/dist/tomcat/tomcat-{{tomcat_major_version}}/v{{tomcat_version}}/bin/{{tomcat_package}}"
+
+tomcat_download_dir: '/usr/local/src'
+
+tomcat_log_level: 'FINE'
+
+tomcat_log_dir: '{{tomcat_dir}}/logs'
+
+tomcat_log_limit: 1024
+
+tomcat_port: 8123
+
+tomcat_shutdown_port: 8006
+
+tomcat_redirect_port: 8443
+
+tomcat_ip: 204.228.236.9
+
+#in milisseconds
+tomcat_connection_timeout: 20000
+

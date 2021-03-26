@@ -1,0 +1,5 @@
+#vars for java 5
+
+java_pack_7u51: 'jdk-7u51-linux-x64.tar.gz'
+
+java_home_7u51: '/usr/local/jdk1.7.0_51'

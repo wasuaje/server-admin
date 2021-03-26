@@ -1,0 +1,28 @@
+
+# Ansible que instala dynamico elUniversal
+# Wuelfhis Asuaje 
+# Infraestructura de Sistemas
+ 
+- name: asegurar que {{local2}}/scripts exists
+  file: path="{{local2}}/scripts"   state=directory owner=manduca group=manduca recurse=yes
+  tags: scripts
+
+- name: Copio resinDynamicEU.conf desde dynamiceu
+  shell: cp {{local2}}/{{admineu}}/conf/resinDynamicEU.conf  {{local2}}/scripts/
+  sudo: yes
+  sudo_user: manduca 
+  tags: copy
+
+- name: Copio dynamic_eu.sh desde dynamiceu
+  shell: cp {{local2}}/{{admineu}}/conf/dynamic_eu.sh  {{local2}}/scripts/
+  sudo: yes
+  sudo_user: manduca 
+  tags: copy
+
+- name: start dynamic_eu.sh desde dynamiceu
+  shell: chdir={{local2}}/scripts chmod +x dynamic_eu.sh && ./dynamic_eu.sh start
+  sudo: yes
+  sudo_user: manduca 
+  environment: manduca_env
+  tags: startadmin
+

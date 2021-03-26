@@ -1,0 +1,13 @@
+
+---
+# vars file for gs
+
+#java_home_5: "/usr/local/jdk1.5.0_22"
+
+cluster_elasticSearch: "eluniversal"
+ip_elasticSearch: "{{ ip_service }}"
+port_tcp_elasticsearch: "9393"
+port_http_elasticsearch: "9292"
+
+elasticSearch: "elasticSearch"
+

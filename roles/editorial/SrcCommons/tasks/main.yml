@@ -1,0 +1,61 @@
+
+# Ansible que instala SrcCommons
+
+
+- name: asegurar que {{local2}} exists
+  file: path="{{local2}}"   state=directory owner=manduca group=manduca recurse=yes
+  tags: files
+
+- name:  CVS Loguin SrcCommons
+  shell: cvs -d :pserver:manduca:D3c4r#m6o!A@{{cvs_ip}}:/home/cvs/commons/ login
+  sudo: yes
+  sudo_user: manduca  
+  tags:  cvs
+
+- name:  Checkout del proyecto SrcCommons
+  command: chdir={{local2}} cvs -d :pserver:manduca@{{cvs_ip}}:/home/cvs/commons checkout {{SrcCommons}}
+  sudo: yes
+  sudo_user: manduca  
+  tags: SrcCommons
+
+- name:  Update del proyecto SrcCommons
+  command: chdir={{local2}}/{{SrcCommons}} cvs update -r PRODUCCION
+  sudo: yes
+  sudo_user: manduca  
+  tags: SrcCommons
+
+- name:  run ant cvsConfigProd
+  shell: chdir={{local2}}/{{SrcCommons}}/conf export LC_ALL=es_VE.ISO8859-1 &&  ant cvsConfigProd
+  sudo: yes
+  sudo_user: manduca  
+  environment: manduca_env
+  tags: SrcCommons
+
+- name: Copio libs de DEUutil a SrcCommons
+  shell: cp {{local2}}/DEUutil/DEUutil.jar {{local2}}/{{SrcCommons}}/lib/
+  sudo: yes
+  sudo_user: manduca  
+  tags: SrcCommons
+
+- name: Copio libs ApiSearchElasticsearch a SrcCommons
+  shell: cp {{local2}}/ApiSearchElasticSearch/apiSearchElasticSearch.jar {{local2}}/{{SrcCommons}}/lib/
+  sudo: yes
+  sudo_user: manduca  
+  tags: SrcCommons
+
+- name: Reemplazar buildproperties con el template SrcCommons
+  template:
+    src=build.properties.j2
+    dest="{{local2}}/{{SrcCommons}}/conf/build.properties"
+  sudo: yes
+  sudo_user: manduca  
+  tags: SrcCommons
+
+- name:  run ant build SrcCommons
+  shell: chdir={{local2}}/{{SrcCommons}}/conf export LC_ALL=es_VE.ISO8859-1 && ant build
+  sudo: yes
+  sudo_user: manduca  
+  environment: manduca_env
+  tags: SrcCommons
+
+

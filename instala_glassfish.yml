@@ -1,0 +1,36 @@
+
+- hosts: db-qa-temp
+  user: root  
+  gather_facts: True
+  #generada con mkpasswd --method=SHA-512 C@r4c*S2o1o
+  vars: 
+  - password: "$6$6Z8tvMbp3a$k06B9GkjfS9b3m3i5Zoi1.PEMEsMddSMjrQjCdsr6Iyfi.upXpPaxUZ.LPiLgLvTQdTfP4u1ocbmrcKTIWWMu/"
+
+  roles:
+  - prerequisitos/java-7u65
+  - prerequisitos/glassfish-311
+
+  tasks:
+  - name: Crear grupo Manduca
+    group: name=manduca state=present gid=1001
+    tags: manduca-user
+
+  - name: Crear usuario Manduca
+    user: name=manduca comment='Manduca User' uid=102 home='/home/manduca' groups='manduca'  password={{password}}
+    tags: manduca-user
+
+  - name: hacer glashfish dueño manduca
+    file: path={{glassfish_dir}} state=directory owner=manduca group=manduca recurse=yes
+    tags: manduca-user2
+
+  - name: hacer java 7 dueño manduca
+    file: path={{java_home_7u65}} state=directory owner=manduca group=manduca recurse=yes
+    tags: manduca-user2     
+
+  - name: Actualizar variables de ambiente en /etc/profile (para todos)
+    shell: echo {{item}} >> /etc/profile
+    with_items:
+    - "###### SETEADOS AUTOMATICAMENTE CON ANSIBLE #######"
+    - "export JAVA_HOME={{java_home_7u65}}"
+    - "export PATH=$PATH:/usr/local/ant/bin:/usr/local/{{java_home_7u65}}/bin"
+    tags: env

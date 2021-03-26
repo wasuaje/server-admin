@@ -1,0 +1,20 @@
+
+- name: asegurar que {{local2}}/lib exists
+  file: path="{{local2}}"   state=directory owner=manduca group=manduca recurse=yes
+  tags: libs
+
+- name: asegurar que {{local2}}/tlds exists
+  file: path="{{local2}}"   state=directory owner=manduca group=manduca recurse=yes
+  tags: libs
+
+- name:  CVS Loguin libs tlds
+  shell: cvs -d :pserver:manduca:D3c4r#m6o!A@{{cvs_ip}}:/home/cvs/commons/ login
+  sudo: yes
+  sudo_user: manduca 
+  tags:  libs
+
+- name:  Checkout del proyecto  libs y tlds
+  command: chdir={{local2}} cvs -d :pserver:manduca@{{cvs_ip}}:/home/cvs/commons checkout lib tlds
+  sudo: yes
+  sudo_user: manduca 
+  tags: libs

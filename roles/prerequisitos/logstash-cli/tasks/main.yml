@@ -1,0 +1,31 @@
+
+
+
+- name: Descargo el logstash
+  shell: chdir=/usr/local/src curl -O {{ lg_download }}{{ lg_pack }}
+  tags: lg142
+
+- name: Descomprimo logstash
+  shell: chdir=/usr/local/ tar -zxvf /usr/local/src/{{lg_pack}}
+  tags: lg142
+
+- name: Copio archivo shipper.conf
+  template: src=shipper.conf   dest={{lg_home}}/shipper.conf
+  tags: lg143
+
+#- name: Copio archivo nginxs_patterns a logstash
+#  copy: src=nginxs_pattern   dest={{lg_home}}/patterns/nginxs
+#  tags: lg141
+
+- name: Copio archivo logstash-cli a init.d
+  template: src=logstash-cli   dest=/etc/init.d/logstash-cli 
+  tags: lg142
+
+- name: permiso de ejecucion logstash
+  shell: chmod +x /etc/init.d/logstash-cli 
+  tags: lg142
+
+- name: carpeta logs logstash
+  shell: mkdir -p /var/log/logstash
+  tags: lg142
+

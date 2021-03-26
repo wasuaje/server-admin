@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+    
+    <!-- Produccion 204.228.236.19 -->
+    <bean id="transportAddress" class="org.elasticsearch.common.transport.InetSocketTransportAddress">
+    	<constructor-arg type="java.lang.String" value="{{ip_elasticSearch}}"/>
+        <constructor-arg type="int" value="{{port_elasticSearch}}"/>
+    </bean>
+    
+    <bean id="managerSearch" class="com.deu.search.elasticSearch.ManagerSearch">
+    	<property name="listTransportAddress">
+    		<list>
+    			<ref bean="transportAddress"/>
+    		</list>
+    	</property>
+    	<property name="nameCluster" value="{{cluster_elasticSearch}}"/>
+    </bean>
+    
+</beans>

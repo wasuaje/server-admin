@@ -1,0 +1,81 @@
+
+# Ansible que instala mediaserver
+# 
+# Requiere ant
+#
+
+
+- name: asegurar que {{local2}} exists
+  file: path="{{local2}}"   state=directory owner=manduca group=manduca recurse=yes
+  tags: cvs
+
+- name:  CVS Loguin {{mediaServer}}
+  shell: cvs -d :pserver:manduca:D3c4r#m6o!A@{{cvs_ip}}:/home/cvs/commons/ login
+  sudo: yes
+  sudo_user: manduca 
+  tags:  cvs
+
+- name:  Checkout del proyecto  {{mediaServer}}
+  command: chdir={{local2}} cvs -d :pserver:manduca@{{cvs_ip}}:/home/cvs/commons checkout {{mediaServer}}
+  sudo: yes
+  sudo_user: manduca 
+  tags: cvs
+
+- name:  Ant config   {{mediaServer}}
+  shell: chdir={{local2}}/{{mediaServer}}/conf  export LC_ALL=es_VE.ISO8859-1 &&  ant cvsConfig
+  sudo: yes
+  sudo_user: manduca   
+  environment: manduca_env
+  tags: antconfig
+
+- name: Copio libs de DEUutil a {{mediaServer}}
+  shell: cp {{local2}}/DEUutil/DEUutil.jar {{local2}}/{{mediaServer}}/webroot/WEB-INF/lib/
+  sudo: yes
+  sudo_user: manduca   
+  tags: copy
+
+- name: Copio libs de SrcCommons a {{mediaServer}}
+  shell: cp {{local2}}/srcCommons/srcCommons.jar  {{local2}}/{{mediaServer}}/webroot/WEB-INF/lib/
+  sudo: yes
+  sudo_user: manduca 
+  tags: copy
+
+- name: Reemplazar buildproperties con el template {{mediaServer}}
+  template:
+    src=build.properties.j2
+    dest="{{local2}}/{{mediaServer}}/conf/build.properties"
+  sudo: yes
+  sudo_user: manduca 
+  tags: reemp
+
+- name: Reemplazar media.sh con el template {{mediaServer}}
+  template:
+    src=media.sh.j2
+    dest="{{local2}}/{{mediaServer}}/conf/media.sh"
+  sudo: yes
+  sudo_user: manduca
+  tags: reemp
+
+- name: Reemplazar resin.conf con el template {{mediaServer}}
+  template:
+    src=resin.conf.j2
+    dest="{{local2}}/{{mediaServer}}/conf/resin.conf"
+  sudo: yes
+  sudo_user: manduca 
+  tags: reemp
+
+- name:  run ant build {{mediaServer}}
+  shell: chdir={{local2}}/{{mediaServer}}/conf export LC_ALL=es_VE.ISO8859-1 &&  ant build
+  sudo: yes
+  sudo_user: manduca 
+  environment: manduca_env
+  tags: build
+
+- name:  Start {{mediaServer}}
+  shell: chdir={{local2}}/{{mediaServer}}/conf chmod +x media.sh && ./media.sh start
+  sudo: yes
+  sudo_user: manduca 
+  environment: manduca_env
+  tags: run
+
+

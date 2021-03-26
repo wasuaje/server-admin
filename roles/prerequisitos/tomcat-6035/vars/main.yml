@@ -1,0 +1,39 @@
+---
+# vars file for tomcat
+tomcat_dir: '/usr/local/apache-tomcat-6.0.35'
+
+tomcat_major_version: '6'
+
+tomcat_minor_version: '0'
+
+tomcat_micro_version: '35'
+
+tomcat_version: "{{tomcat_major_version}}.{{tomcat_minor_version}}.{{tomcat_micro_version}}"
+
+tomcat_package: 'apache-tomcat-{{tomcat_version}}.tar.gz'
+
+tomcat_download_url: "http://archive.apache.org/dist/tomcat/tomcat-{{tomcat_major_version}}/v{{tomcat_version}}/bin/{{tomcat_package}}"
+
+tomcat_download_dir: '/usr/local/src'
+
+tomcat_log_level: 'FINE'
+
+tomcat_log_dir: '{{tomcat_dir}}/logs'
+
+tomcat_log_limit: 1024
+
+tomcat_port: 8005
+
+tomcat_shutdown_port: 6005
+
+tomcat_ajp_port: 6009
+
+tomcat_redirect_port: 6443
+
+#in milisseconds
+tomcat_connection_timeout: 20000
+
+tomcat_users: [
+  { name: 'tomcat', password: 'tomcat', roles: 'tomcat,admin-gui'}
+]
+

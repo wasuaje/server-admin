@@ -1,0 +1,189 @@
+---
+# plays common across all servers
+
+- name: Todos los paquetes actualizados y ultima version de SO
+  shell: yum update -y && yum upgrade -y
+  tags: update-pack
+
+- name: ensure wget present
+  yum: name=wget state=present
+  tags: dag-repo
+
+#when usado para que no se ejecute en Oracle linux
+- name: Copy dag repo
+  copy: src=dag.repo dest=/etc/yum.repos.d/dag.repo
+  tags: dag-repo
+  when: ansible_distribution == "CentOS"
+
+#when usado para que no se ejecute en Oracle linux
+- name: Install dag repo key
+  shell: wget http://dag.wieers.com/rpm/packages/RPM-GPG-KEY.dag.txt
+  tags: dag-repo
+  when: ansible_distribution == "CentOS"
+
+#when usado para que no se ejecute en Oracle linux
+- name: import dag key
+  shell: rpm --import /root/RPM-GPG-KEY.dag.txt 
+  tags: dag-repo
+  when: ansible_distribution == "CentOS"
+
+  #when usado para que no se ejecute en Oracle linux
+- name: Asegurarse que se puede instalar kernel-headers
+  shell: yum install -y kernel-headers --disableexcludes=all
+  tags: kernels
+  when: ansible_distribution == "CentOS"
+
+- name: install utilitarios y dependencias
+  yum: name={{ item }} state=present
+  with_items:   
+   - zip
+   - unzip   
+   - nano
+   - cvs    
+   - lynx   
+   - gcc    
+   - autoconf
+   - automake
+   - which 
+   - nfs* 
+   - make 
+   - tar 
+   - dos2unix 
+   - sudo 
+   - vixie-cron 
+   - crontabs 
+   - dstat 
+   - sysstat
+   - htop
+   - iftop
+   - ntp
+   - tzdata
+   - alpine
+  tags: utils
+  ignore_errors: True
+
+
+- name: Agregar servicios al inicio y apagar los que no necesito
+  shell: service iptables stop; chkconfig iptables off; service portmap start; chkconfig portmap on; service nfs start; chkconfig nfs on; service ntpd start; chkconfig ntpd on
+  tags: services
+  ignore_errors: True
+
+#- name: Copy bashprofile
+#  copy: src=.bash_profile dest=/root/.bash_profile
+#  tags: bash
+
+#- name: Copy bashrc
+#  copy: src=.bashrc dest=/root/.bashrc
+#  tags: bash
+
+# Creo los grupos que necesita manduca
+#when usado para que no se ejecute en Oracle linux
+
+- name: Crear grupo Manduca
+  group: name=manduca state=present gid=1001
+  tags: manduca-user
+#  when: ansible_distribution == "CentOS"
+
+- name: Crear usuario Manduca
+  user: name=manduca comment='Manduca User' uid=102 home='/home/manduca' groups='manduca'  password={{password}}
+  tags: manduca-user
+#  when: ansible_distribution == "CentOS"
+
+
+#Ajustes en sshd en cuanto performance
+
+- name: Eliminar GSSAPI para coneccion mas rapida
+  shell: sed -i s/GSSAPIAuthentication yes/GSSAPIAuthentication no/g /etc/ssh/sshd_config
+  tags: ssh-config
+  ignore_errors: True 
+
+- name: Comentar linear GSSAPI  yes
+  shell: sed -i s/GSSAPIAuthentication yes/#GSSAPIAuthentication yes/g /etc/ssh/sshd_config
+  tags: ssh-config
+  ignore_errors: True 
+
+- name: Reiniciar sshd
+  shell: service sshd restart
+  tags: ssh-config
+  ignore_errors: True
+
+#Requiere reboot
+- name: Deshabilitando Selinux
+  shell: sed -i s/SELINUX=enabled/SELINUX=disabled/g /etc/selinux/config
+  tags: selinux-config
+  ignore_errors: True 
+
+#parametros del kernel
+- name: Copiar Parametros del Kernell sysctl
+  copy: src=sysctl.conf.bkp dest=/etc/sysctl.conf.bkp
+  tags: kernel
+  when: ansible_distribution == "CentOS"
+
+- name: Setear Parametros del Kernell sysctl
+  shell: cat /etc/sysctl.conf.bkp >> /etc/sysctl.conf 
+  tags: kernel
+  when: ansible_distribution == "CentOS"
+
+- name: Copiar Parametros del Kernell limits
+  copy: src=limits.conf.bkp dest=/etc/security/limits.conf.bkp
+  tags: kernel
+  when: ansible_distribution == "CentOS"
+
+- name: Setear Parametros del Kernell limits
+  shell: cat /etc/security/limits.conf.bkp >> /etc/security/limits.conf 
+  tags: kernel
+  when: ansible_distribution == "CentOS"
+
+- name: Hacer cambios funcionar Sysctl y Limits
+  shell: sysctl -p
+  tags: kernel
+  ignore_errors: True
+  when: ansible_distribution == "CentOS"
+
+- name: Actualizar /etc/hosts con valores para cvs
+  shell: echo {{cvs_ip}} {{cvs_host}} >> /etc/hosts
+  tags: hostfile
+  when: ansible_distribution == "CentOS"
+ 
+ #llaveros 
+- name: Directorio .ssh manduca existe
+  file: path="/home/manduca/.ssh"   state=directory
+  tags: llaveros
+  #when: ansible_distribution == "CentOS"
+
+- name: Directorio .ssh root existe
+  file: path="/root/.ssh"   state=directory
+  tags: llave-root
+
+- name: Copio llavero de manduca a la maquina
+  copy: src=authorized_keys_manduca dest=/home/manduca/ak_borrar.txt
+  tags: llaveros
+  #when: ansible_distribution == "CentOS"
+
+- name: Copio llavero de root a la maquina
+  copy: src=authorized_keys_root dest=/root/ak_borrar.txt
+  tags: llave-root
+
+- name: Agrego llaveros a manduca
+  shell: cat /home/manduca/ak_borrar.txt >> /home/manduca/.ssh/authorized_keys  
+  tags: llaveros
+  #when: ansible_distribution == "CentOS"
+
+- name: Agrego llaveros a root
+  shell: cat /root/ak_borrar.txt >> /root/.ssh/authorized_keys  
+  tags: llave-root
+
+- name: Elimino archivos innecesarios
+  file: src={{ item.path }} state=absent
+  with_items:
+    - { path: /home/manduca/ak_borrar.txt }
+    - { path: /root/ak_borrar.txt }
+    - { path: /root/RPM-GPG-KEY.dag.txt }
+    - { path: /etc/sysctl.conf.bkp }
+    - { path: /etc/limits.conf.bkp }
+  ignore_errors: True
+  tags: borra-innecesarios
+
+
+
+

@@ -1,0 +1,24 @@
+
+# - name: Display all variables/facts known for a host
+#   debug: var=hostvars[inventory_hostname]
+  
+- name: Copiando y renderizando templates
+  template:
+    src={{ nginx_avail }}{{ item }}
+    dest={{ nginx_home }}{{ nginx_avail }}{{ item }}    
+    owner=root
+    group=root  
+  with_items:
+    - "{{ templates }}"
+
+
+
+- name: Creando link simbolico a sites enable sino existe   
+  file: 
+    src={{ nginx_home }}{{ nginx_avail }}{{ item }}
+    dest={{ nginx_home }}{{ nginx_enabl }}{{ item }}
+    state=link 
+    force=yes
+  with_items:
+    - "{{ templates }}" 
+

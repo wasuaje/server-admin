@@ -1,0 +1,13 @@
+
+---
+# vars file for gs
+
+#java_home_6: "/usr/local/jdk1.6.0_33"
+#catalina_home_6: "/usr/local/apache-tomcat-6.0.35"
+
+memcache_server: "127.0.0.1:11211"
+memcache_namespace: "DEU:38deed14c2c1cefb197f37b5c72"
+
+#local2:"/local2/applications/"
+
+DEUMovil: "deumovil"

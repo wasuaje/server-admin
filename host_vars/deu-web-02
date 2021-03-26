@@ -1,0 +1,39 @@
+app03_ip: "204.228.236.24"
+app02_ip: "204.228.236.22"
+app01_ip: "204.228.236.21"
+upstream_eluniversal_dinamico_port: "8100"
+upstream_estampas_dinamico_port: "7100"
+upstream_ceu_backend_port: "8000"
+eu_server_name: "www.eluniversal.com eluniversal.com"
+eu_static_server_name: "static.eluniversal.com images.eluniversal.com cdn.eluniversal.com"
+es_server_name: "www.estampas.com"
+widget_server_name: "widget.eluniversal.com"
+widget_static_server_name: "static.widget.eluniversal.com"
+widget_backend_port: "7000"
+eu_redirect : "www.eluniversal.com"
+es_redirect : "www.estampas.com"
+service_ip: "{{ ansible_all_ipv4_addresses[1] }}"
+clasideu_apache: "204.228.236.13"
+log_json:  "access_log logs/json-static-elunivesal-access.log json;"
+eu_static_location: > 
+ location ~* \.(jpg|gif|png|js|css|htc|ttf|otf|woff|svg|rss|xml)$ {
+        # \.(jpg|gif|swf|png|thumb|js|css|htc|doc|docx|xls|xlsx|ppt|pptx|ttf|otf|woff|svg)$ {
+ return 301 http://cdn.eluniversal.com$uri$is_args$args;
+ }
+
+ location ~* \.pdf$ {
+  return 301 http://images.eluniversal.com/$uri$is_args$args;
+ } 
+
+es_static_location: >
+ location ~* \.(?:jpg|jpeg|gif|png|ico|gz|svg|svgz|mp4|ogg|ogv|webm|htc)$ {
+  return 301 http://static.estampas.com/$uri$is_args$args;
+ } 
+
+static_subfilter_block: >
+ subs_filter (static|images).eluniversal.com cdn.eluniversal.com ;
+ subs_filter '"/images/facefiles/loading.gif"' '"http://cdn.eluniversal.com/images/facefiles/loading.gif"' ir;
+ subs_filter "'/images/facefiles/loading.gif'" "'http://cdn.eluniversal.com/images/facefiles/loading.gif'" ir;
+ subs_filter "'/images/facefiles/closelabel.gif'" "'http://cdn.eluniversal.com/images/facefiles/closelabel.gif'" ir;
+
+

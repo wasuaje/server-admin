@@ -1,0 +1,14 @@
+
+---
+# vars file for gs
+
+#java_home_5: "/usr/local/jdk1.5.0_22"
+
+ip_app: "{{ ip_service }}"
+port_app: "8003"
+
+jdbc_content: "jdbc:oracle:thin:@204.228.236.50:1521:content"
+jdbc_user_content: "mediaserver"
+jdbc_pass_content: "P0nZ0n#0$4!"
+
+mediaServer: "mediaServer"

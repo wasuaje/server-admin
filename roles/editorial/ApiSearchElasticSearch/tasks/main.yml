@@ -1,0 +1,49 @@
+
+# Ansible que instala ApiSearchElasticSearch
+
+- name: asegurar que {{local2}} exists
+  file: path="{{local2}}"   state=directory owner=manduca group=manduca recurse=yes
+  tags: apis
+
+- name:  CVS Loguin ApiSearchElasticSearch
+  shell: cvs -d :pserver:manduca:D3c4r#m6o!A@{{cvs_ip}}:/home/cvs/commons/ login
+  sudo: yes
+  sudo_user: manduca 
+  tags:  apis
+
+- name:  Checkout del proyecto  ApiSearchElasticSearch
+  command: chdir={{local2}} cvs -d :pserver:manduca@{{cvs_ip}}:/home/cvs/commons checkout {{ApiSearchElasticSearch}}
+  sudo: yes
+  sudo_user: manduca 
+  tags: apis
+
+- name:  Upadate del proyecto ApiSearchElasticSearch
+  command: chdir={{local2}}/{{ApiSearchElasticSearch}} cvs update -r PRODUCCION
+  sudo: yes
+  sudo_user: manduca 
+  tags: apis
+
+- name: Copio libs de DEUutil a ApiSearchElasticSearch
+  shell: cp /local2/applications/DEUutil/DEUutil.jar {{local2}}/{{ApiSearchElasticSearch}}/lib/
+  sudo: yes
+  sudo_user: manduca 
+  tags: apis
+
+- name: Reemplazar buildproperties con el template ApiSearchElasticSearch
+  template:
+    src=build.properties.j2
+    dest="{{local2}}/{{ApiSearchElasticSearch}}/conf/build.properties"
+  sudo: yes
+  sudo_user: manduca 
+  tags: apis
+
+- name:  run ant build ApiSearchElasticSearch
+  shell: chdir={{local2}}/{{ApiSearchElasticSearch}}/conf  export LC_ALL=es_VE.ISO8859-1 &&  ant build
+  sudo: yes
+  sudo_user: manduca 
+  environment: manduca_env
+  tags: apis
+
+
+
+

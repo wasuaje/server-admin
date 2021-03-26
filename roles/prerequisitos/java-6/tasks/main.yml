@@ -1,0 +1,18 @@
+
+##Este procedimiento solo funciona para java 6 los demas con descomprimir basta
+
+- name: Copio el java 6 a usr local
+  copy: src={{java_pack_6}} dest={{main_app_home}}
+  tags: java6
+
+- name: hay que hacerlo ejecutable
+  shell: chmod +x {{main_app_home}}/{{java_pack_6}} 
+  tags: java6
+
+- name: ejecutar el binario
+  shell: chdir={{main_app_home}} echo -e 'y\ny\n\n' | ./{{java_pack_6}}
+  tags: java6
+
+- name: Hacer dueño a manduca
+  shell: chown manduca.manduca -R {{java_home_6}}
+  tags: java6

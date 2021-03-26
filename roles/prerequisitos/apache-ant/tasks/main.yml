@@ -1,0 +1,23 @@
+
+- name: download ANT
+  action: get_url
+      url="{{ant_download_url}}"
+      dest="/usr/local/src"
+  tags: ant
+
+- name: unpacks ANT
+  shell: tar -zxvf /usr/local/src/apache-ant-1.9.4-bin.tar.gz -C /usr/local
+  tags: ant
+
+- name: Actualizar variables de ambiente en /etc/profile (para todos)
+  shell: echo {{item}} >> /etc/profile
+  with_items:
+  - "export ANT_HOME=/usr/local/ant"      
+  - "export PATH=$PATH:/usr/local/ant/bin"
+  tags: env
+
+- name: Link symbolico ant
+  file: src={{ant_home}} dest={{main_app_home}}/ant owner=manduca group=manduca state=link
+  tags: links
+  ignore_errors: True
+  

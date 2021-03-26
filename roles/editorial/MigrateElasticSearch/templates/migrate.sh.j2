@@ -1,0 +1,110 @@
+#!/bin/sh
+##
+# 
+##
+JAVA_HOME={{java_home_5}}
+JAVA=$JAVA_HOME"bin/java"
+#export JAVA_HOME
+HELP_COMAND="Usar los comandos: (-type tipo-articulo | -channel codigo-canal | -parent-channel codigo-canal | -article-id id-del-articulo | help)"
+
+APP_HOME=/local2/applications/MigrateToElasticSearch
+
+APP_NAME="MigrateElasticSearch"
+
+#Tomamos el primer parametro pasado
+#ARGV="$1"
+
+#echo "-----------"
+
+##
+# Funcion que valida un directorio
+##
+validarDirectorio ()
+{
+        local DIR_VALIDAR
+        DIR_VALIDAR=$1
+        if [ ! -d $DIR_VALIDAR ]
+        then
+                echo "Directorio NO EXISTE -> "$DIR_VALIDAR
+                exit 1
+        fi
+}
+##
+# Funcion que valida un directorio
+##
+validarDirectorioCrear ()
+{
+        local DIR_VALIDAR
+        DIR_VALIDAR=$1
+        if [ ! -d $DIR_VALIDAR ]
+        then
+                mkdir $DIR_VALIDAR
+        fi
+}  
+##
+# Funcion que valida un Archivo  
+##               
+validarArchivo ()
+{
+        local ARCH_VALIDAR
+        ARCH_VALIDAR=$1
+        if [ ! -f $ARCH_VALIDAR ]
+        then                
+                echo "Archivo NO EXISTE -> "$ARCH_VALIDAR
+                exit 1
+        fi            
+}
+
+CLASS_PATH=$APP_HOME/migrateToElasticSearch.jar:$APP_HOME/lib/log4j-1.2.4.jar:$APP_HOME/lib/commons-collections-3.2.jar:$APP_HOME/lib/apiSearchElasticSearch.jar:$APP_HOME/lib/DEUutil.jar:$APP_HOME/lib/ojdbc14.jar:$APP_HOME/lib/gson-1.7.1.jar:$APP_HOME/lib/srcCommons.jar:$APP_HOME/lib/mail.jar:$APP_HOME/lib/activation.jar:$APP_HOME/lib/commons-resources.jar
+CLASS_MAIN=com.deu.migrate.Migrate
+
+if [ $# -eq 2 ]
+then
+	#BUSCAMOS LA CANTIDAD DE PROCESOS EJECUTANDOSE CON LOS MISMOS PARAMETROS
+    COUNT_RUN=`ps -ef | grep "$CLASS_MAIN $1 $2" | grep -v "grep" | awk '{print \$2}' | wc | awk '{print \$1}'`
+	
+	#SI NO HAY NINGUN PROCESO EJECUTNADOSE PROCEDEMOS A EJECUTARLO
+    if [ "$COUNT_RUN" = "0" ]
+    then
+        echo "****************************************************************"
+        echo "INICIO DEL PROCESO...`date`"
+        echo "****************************************************************"
+        $JAVA -cp .:$CLASS_PATH $CLASS_MAIN $1 $2
+        echo "****************************************************************"
+        echo "FIN DEL PROCESO.`date`"
+        echo "****************************************************************"
+   else
+       	echo "****************************************************************"
+        echo "LA APLICACION $APP_NAME YA SE ESTA EJECUTANDO CON ESTOS PARAMETROS $1 $2"
+        echo "****************************************************************"
+        exit 1
+    fi
+else
+if [ $# -eq 4 ]
+then
+	#BUSCAMOS LA CANTIDAD DE PROCESOS EJECUTANDOSE CON LOS MISMOS PARAMETROS
+    COUNT_RUN=`ps -ef | grep "$CLASS_MAIN $1 $2 $3 $4" | grep -v "grep" | awk '{print \$2}' | wc | awk '{print \$1}'`
+
+	#SI NO HAY NINGUN PROCESO EJECUTNADOSE PROCEDEMOS A EJECUTARLO
+    if [ "$COUNT_RUN" = "0" ]
+    then
+        echo "****************************************************************"
+        echo "INICIO DEL PROCESO...`date`"
+        echo "****************************************************************"
+        $JAVA -cp .:$CLASS_PATH $CLASS_MAIN $1 $2 $3 $4
+        echo "****************************************************************"
+        echo "FIN DEL PROCESO.`date`"
+        echo "****************************************************************"
+    else
+       	echo "****************************************************************"
+        echo "LA APLICACION $APP_NAME YA SE ESTA EJECUTANDO CON ESTOS PARAMETROS $1 $2 $3 $4"
+        echo "****************************************************************"
+        exit 1
+    fi
+else
+    echo $HELP_COMAND
+    exit 1
+fi
+
+fi
+#exit 0

@@ -1,0 +1,5 @@
+---
+
+- name: restart tomcat
+  shell:
+    "nohup {{tomcat_dir}}/tomcat.sh &"

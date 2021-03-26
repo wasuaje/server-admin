@@ -1,0 +1,71 @@
+
+# Ansible que instala publisher 2
+
+
+- name:  Ant config  {{publisher2}}
+  shell: chdir={{local2}}/publisher/conf export LC_ALL=es_VE.ISO8859-1 && ant cvsConfigPublisher2
+  sudo: yes
+  sudo_user: manduca 
+  environment: manduca_env
+  tags: antconfig
+
+- name: Reemplazar buildproperties con el template {{publisher2}}
+  template:
+    src=build.properties.j2
+    dest="{{local2}}/{{publisher2}}/conf/build.properties"
+  sudo: yes
+  sudo_user: manduca 
+  tags: reemp
+
+- name: Reemplazar publisher.sh.j2 con el template {{publisher2}}
+  template:
+    src=publisher.sh.j2
+    dest="{{local2}}/{{publisher2}}/conf/publisher.sh"
+  sudo: yes
+  sudo_user: manduca 
+  tags: reemp
+
+- name: Reemplazar resin_publisher.conf.j2 con el template {{publisher2}}
+  template:
+    src=resin_publisher.conf.j2
+    dest="{{local2}}/{{publisher2}}/conf/resin_publisher.conf"
+  sudo: yes
+  sudo_user: manduca 
+  tags: reemp
+
+- name: Reemplazar Configuration.properties.j2 con el template {{publisher2}}
+  template:
+    src=Configuration.properties.j2
+    dest="{{local2}}/{{publisher2}}/root/WEB-INF/resources/Configuration.properties"
+  sudo: yes
+  sudo_user: manduca 
+  tags: reemp
+
+- name: Reemplazar Global.properties con el template {{publisher2}}
+  template:
+    src=Global.properties.j2
+    dest="{{local2}}/{{publisher2}}/root/WEB-INF/resources/Global.properties"
+  sudo: yes
+  sudo_user: manduca 
+  tags: reemp
+
+- name: Reemplazar log4j.properties.j2 con el template {{publisher2}}
+  template:
+    src=log4j.properties.j2
+    dest="{{local2}}/{{publisher2}}/root/WEB-INF/resources/log4j.properties.j2"
+  sudo: yes
+  sudo_user: manduca 
+  tags: reemp
+
+- name:  run ant build {{publisher1}}
+  shell: chdir={{local2}}/{{publisher2}}/conf export LC_ALL=es_VE.ISO8859-1 && ant compile
+  sudo: yes
+  sudo_user: manduca 
+  environment: manduca_env
+  tags: build
+
+- name:  Start {{publisher1}}
+  shell: chdir={{local2}}/{{publisher2}}/conf chmod +x publisher.sh && ./publisher.sh start
+  sudo: yes
+  sudo_user: manduca 
+  tags: run

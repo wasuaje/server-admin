@@ -1,0 +1,5 @@
+#vars for java 5
+
+java_pack: 'jdk-7u60-linux-i586.tar.gz'
+
+java_home_7: '/usr/local/jdk1.7.0_60'

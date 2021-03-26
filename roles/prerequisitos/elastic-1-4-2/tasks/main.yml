@@ -1,0 +1,36 @@
+
+
+
+- name: Descarga de elasticsearch 
+  shell: chdir=/usr/local/src wget {{ es142_download }}{{ es142_pack }}
+  tags: es142
+
+- name: Descomprimo elasticsearch
+  shell: chdir=/usr/local/  tar -zxvf /usr/local/src/{{es142_pack}}
+  tags: es142
+
+- name: Descargo service wrapper para elasticsearch
+  shell: chdir=/usr/local/src/ curl -L http://github.com/elasticsearch/elasticsearch-servicewrapper/tarball/master | tar -xvz
+  tags: es142
+
+- name: Muevo service wrapper para elasticsearch a su sitio final
+  shell: chdir=/usr/local/src/  mv *servicewrapper*/service {{es142_home}}/bin/; mv {{es142_home}}/bin/service/elasticsearch {{es142_home}}/bin/service/elasticsearchlogstash 
+  tags: es142
+
+- name: cambio nombre de app en elastic logstash
+  shell: chdir=/etc/init.d sed -i 's/APP_NAME\="elasticsearch"/APP_NAME\="elasticsearchlogstash"/g' {{es142_home}}/bin/service/elasticsearchlogstash
+  tags: es142
+
+- name: cambio nombre de app long name en elastic logstash
+  shell: chdir=/etc/init.d sed -i 's/APP_LONG_NAME\="Elasticsearch"/APP_LONG_NAME\="ElasticsearchLogstash"/g' {{es142_home}}/bin/service/elasticsearchlogstash
+  tags: es142
+
+- name: Ejecuto el service wrapper install  para elasticsearch 
+  shell: chdir=/usr/local/ {{es142_home}}/bin/service/elasticsearchlogstash install 
+  tags: es142
+
+- name: Creo Carpeta para logs 
+  shell: mkdir -p {{es142_home}}/logs/
+  tags: es142
+
+

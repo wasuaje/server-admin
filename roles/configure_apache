@@ -1,0 +1,31 @@
+./configure --prefix=/usr/local/apache --enable-nonportable-atomics=yes \ 
+--enable-cache \ 
+--enable-mem-cache  \ 
+--enable-disk-cache  \ 
+--enable-deflate  \ 
+--enable-expires  \ 
+--enable-headers \ 
+--enable-log-config \ 
+--enable-rewrite \ 
+--enable-suexec \ 
+--enable-autoindex \ 
+--enable-asis  \ 
+--enable-cgi  \ 
+--enable-cgid  \ 
+--enable-filter \ 
+--enable-negotiation \ 
+--enable-proxy \ 
+--enable-proxy_http \ 
+--enable-status  \ 
+--enable-authn_file \ 
+--enable-auth_basic \ 
+--enable-authn_default \ 
+--enable-authz_user \ 
+--enable-authz_default \ 
+--enable-authz_groupfile \ 
+--enable-authz_host  \ 
+--enable-actions  \ 
+--enable-userdir \ 
+--enable-version \ 
+--with-mpm=worker \ 
+--with-suexec-caller=102

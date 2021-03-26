@@ -1,0 +1,7 @@
+---
+
+- name: Agrego la llave a authorized_keys
+  assemble: src={{ansible_hostname}}  dest=/home/manduca/.ssh/authorized_keys delimiter='######' remote_src=False
+  tags: agrega
+
+

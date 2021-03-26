@@ -1,0 +1,26 @@
+
+
+
+- name: Descargo el logstash
+  shell: chdir=/usr/local/src curl -O {{ lg_download }}{{ lg_pack }}
+  tags: lg142
+
+- name: Descomprimo logstash
+  shell: chdir=/usr/local/ tar -zxvf /usr/local/src/{{lg_pack}}
+  tags: lg142
+
+- name: Copio archivo indexer.conf
+  template: src=indexer.conf   dest={{lg_home}}/indexer.conf
+  tags: lg141
+
+- name: Copio archivo logstash-indexer a init.d
+  template: src=logstash-indexer   dest=/etc/init.d/logstash-indexer
+  tags: lg142
+
+- name: ejecutable logstash
+  shell: chmod +x /etc/init.d/logstash-indexer
+  tags: lg142
+
+- name: carpeta logs logstash
+  shell: mkdir -p /var/log/logstash
+  tags: lg142

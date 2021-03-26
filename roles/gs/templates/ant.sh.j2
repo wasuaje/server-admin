@@ -1,0 +1,14 @@
+#!/bin/bash
+#
+#
+
+# Variables de Ambiente
+JAVA_HOME={{java_home}}
+ANT_HOME={{ant_home}}
+
+PATH=$JAVA_HOME/bin:$PATH
+
+export PATH JAVA_HOME ANT_HOME
+
+$ANT_HOME/bin/ant $1
+

@@ -1,0 +1,13 @@
+
+# Ansible que instala la guia elasticSearch
+
+- name: Reemplazar elasticsearch.yml en {{es3026_home}}/config
+  template:
+    src=elasticsearch.yml.j2
+    dest="{{es3026_home}}/config/elasticsearch.yml"
+  tags: eS
+
+
+- name: Copio el mappings de SearchElasticsearch  a {{es3026_home}}
+  shell: cp -r {{local2}}/{{SearchElasticSearch}}/conf/ES/mappings {{es3026_home}}/config/
+  tags: eS

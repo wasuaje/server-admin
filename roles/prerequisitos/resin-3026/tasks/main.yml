@@ -1,0 +1,14 @@
+
+##Este procedimiento solo funciona p
+
+- name: Copio el resin a usr local src
+  copy: src={{resin_pack_3026}} dest=/usr/local/src
+  tags: resin3026
+
+- name: Descomprimir resin
+  shell: echo -e "A\n" | unzip /usr/local/src/{{resin_pack_3026}} -d /usr/local/
+  tags: resin3026
+
+- name: Hacer dueño a manduca
+  shell: chown manduca.manduca -R {{resin_home_3026}}
+  tags: resin3026

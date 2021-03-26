@@ -1,0 +1,95 @@
+# file: logstash_server.yml
+
+- hosts: all
+  user: root  
+  
+  vars:  
+  - main_app_home: "/usr/local"  
+  - manduca_env:
+      JAVA_HOME: "/usr/local/jdk7"      
+      PATH: "/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/bin:/usr/local/jdk7/bin" 
+
+  roles:
+  #- prerequisitos/java-7u65
+  - prerequisitos/elastic-1-4-2
+  - prerequisitos/logstash
+
+  tasks: 
+
+  - name: Instalar prerequisitos logstash (redis)
+    yum: name={{ item }} state=present
+    with_items: 
+    - ruby
+    - ruby-devel
+    - ruby-ri
+    - ruby-rdoc
+    tags: yum
+    ignore_errors: true
+
+
+  - name: Descargar repo epel para  Redis
+    shell: chdir=/usr/local/src wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+    tags: redispack
+    ignore_errors: true
+
+  - name: Install repo epel para  Redis
+    shell: chdir=/usr/local/src rpm -Uvh epel-release*rpm
+    tags: redispack
+    ignore_errors: true
+
+  - name: Instalar  redis               
+    shell: yum install redis -y
+    tags: redispack
+
+  - name: Descargar RubyGems
+    shell: chdir=/usr/local/src wget http://production.cf.rubygems.org/rubygems/rubygems-2.4.6.tgz
+    tags: ruby-gems
+
+  - name: Descomprimir RubyGems
+    shell: chdir=/usr/local/ tar -zxvf src/rubygems-2.4.6.tgz
+    tags: ruby-gems
+
+  - name: Instalar RubyGems
+    shell: chdir=/usr/local/rubygems-2.4.6 ruby setup.rb
+    tags: ruby-gems  
+
+  - name: Descargar Kibana
+    shell: chdir=/usr/local/src wget https://download.elasticsearch.org/kibana/kibana/kibana-4.0.1-linux-x64.tar.gz
+    tags: kibana
+
+  - name: Descomprimir Kibana
+    shell: chdir=/usr/local/ tar -zxvf src/kibana-4.0.1-linux-x64.tar.gz
+    tags: kibana
+
+  - name: cambio configuracion de Redis.conf para que oiga en todas las ip
+    shell: chdir=/etc sed -i 's/bind 127.0.0.1/\#bind 127.0.0.1/g' redis.conf 
+    tags: redissed
+
+  - name: Iniciar servicio Redis
+    shell: chkconfig redis on;  service redis start
+    tags: redisstart
+
+  - name: cambia nombre de cluster elastic search
+    shell: chdir={{es142_home}}/config sed -i 's/\#cluster.name elasticsearch/cluster.name logstash/g' elasticsearch.yml 
+    tags: elasticstart
+
+  - name: Iniciar servicio Elasticsearch
+    shell: chkconfig elasticsearchlogstash  on;  /etc/init.d/elasticsearchlogstash start
+    tags: elasticstart
+    environment: manduca_env
+
+  - name: Iniciar servicio Logstash
+    shell: chkconfig logstash-indexer on;  /etc/init.d/logstash-indexer start
+    tags: lgstart
+    environment: manduca_env
+  
+  - name: Iniciar Kibana
+    shell: chdir=/usr/local/kibana-4.0.1-linux-x64/bin nohup ./kibana 
+    tags: kibanastart
+
+
+#logstash en cada maquina
+
+
+#Ejecutese asi 
+# ansible-playbook -i desa  -l infra-desa02 logstash_server.yml -C

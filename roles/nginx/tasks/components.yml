@@ -1,0 +1,13 @@
+
+
+- name: Copiando components
+  copy:
+    src={{ nginx_comp }}{{ item }}
+    dest={{ nginx_home }}{{ nginx_comp }}{{ item }}    
+    owner=root
+    group=root
+    force=yes
+  with_items:
+    - "{{ components }}"
+ 
+ 

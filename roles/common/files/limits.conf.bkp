@@ -1,0 +1,7 @@
+* hard nofile 131072
+* soft nofile 65536
+manduca soft nproc 20000
+manduca hard nproc 20000
+crons soft nproc 20000
+crons hard nproc 20000
+

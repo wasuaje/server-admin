@@ -1,0 +1,19 @@
+
+---
+# vars file for gs
+
+java_home_5: "/usr/local/jdk1.5.0_22"
+
+ip_app: "204.228.236.17"
+port_app: "8001"
+
+jdbc_content: "jdbc:oracle:thin:@204.228.236.50:1521:content"
+jdbc_user_content: "content"
+jdbc_pass_content: "P0nZ0n#0$4!"
+jdbc_cvf3: "jdbc:oracle:thin:@204.228.236.49:1521:cvf3"
+jdbc_user_cvf3: "EMPPUBLISH"
+jdbc_pass_cvf3: "n3ur0t#x1n4s"
+jdbc_clasif: "jdbc:oracle:thin:@204.228.236.47:1521:clasideu"
+jdbc_user_clasif: "deupublish"
+jdbc_pass_clasif: "c1t0t#x!n4s"
+

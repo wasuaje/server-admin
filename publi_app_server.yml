@@ -1,0 +1,29 @@
+# file: tadminempleos.yml
+#- hosts: desa-app-edit
+- hosts: clouda
+  user: root
+  
+  #todos y cada uno de los roles que se requieren para montar esta maquina
+  roles:
+    - java6021
+    - java7051
+    - resin3026
+    - jboss510
+    - tomcat-750
+    - elastic0202
+    - adminempleos
+    - empleosonline
+    - payment
+    - servlet
+    - modulofoto
+    - mapas
+    - clasificados
+    - clasifadmin
+    - appliteprofiler
+    - buscadorobituario
+    - fileupload
+    - gs
+    - root
+    - indiceavisos
+    - indiceestampas
+   

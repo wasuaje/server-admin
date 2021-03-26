@@ -1,0 +1,43 @@
+
+# Ansible que instala la guia de servicios
+# Requiere ip con acceso a 204.228.236.7:6200 <-cable
+# Requiere ant
+# http://204.13.51.76/GS/2014-06-15    -> ejemplo para verificar que funcione, debe traer un json con data
+
+- name: download ANT
+  action: get_url
+      url="{{ant_download_url}}"
+      dest="/usr/local/src"
+  tags: ant
+
+- name: unpacks ANT
+  shell: tar -zxvf /usr/local/src/apache-ant-1.9.4-bin.tar.gz -C /usr/local
+  tags: ant
+
+- name:  CVS Loguin
+  shell: cvs -d :pserver:cvsuser:cvsuser@{{cvs_ip}}:/home/cvs/guiaservicios login
+  tags:  cvs
+
+- name: asegurar que {{local2}} exists
+  file: path="{{local2}}"   state=directory owner=manduca group=manduca recurse=yes
+  tags: cvs
+
+- name:  Checkout del proyecto guia de servicios
+  command: chdir={{local2}} cvs -d :pserver:cvsuser:cvsuser@{{cvs_ip}}:/home/cvs/ co guiaservicios
+  tags: cvs
+
+- name: Reemplazar ant.sh con el template
+  template:
+    src=ant.sh.j2
+    dest="{{local2}}/guiaservicios/guiaservicioWebPublic/script/ant.sh"
+  tags: gs
+
+- name:  run ant build
+  command: chdir={{local2}}/guiaservicios/guiaservicioWebPublic/script/ /bin/bash ant.sh package
+  tags: gs
+
+- name:  run ant build
+  command: chdir={{local2}}/guiaservicios/guiaservicioWebPublic/script/ /bin/bash ant.sh createWebapp
+  tags: gs
+
+

@@ -1,0 +1,5 @@
+#vars for java 5
+
+java_pack_6u45: 'jdk-6u45-linux-x64.bin'
+
+java_home_6u45: '/usr/local/jdk1.6.0_45'

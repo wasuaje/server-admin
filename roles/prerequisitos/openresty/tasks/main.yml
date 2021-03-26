@@ -1,0 +1,179 @@
+
+- name: instalacion de los prerequisitos
+  yum: name={{ item }} state=present 
+  with_items:
+  - gcc
+  - gcc-c++
+  - make
+  - zlib-devel
+  - pcre-devel
+  - readline-devel
+  - openssl-devel
+  - perl
+  - wget
+  - git
+  - zip
+  - unzip
+  - libselinux
+  - gzip
+  - libselinux-python
+  tags: prerequisitos
+  ignore_errors: True
+
+
+#instalacion geoip
+
+- name: copia Geoip a /usr/local
+  copy: src={{geoip_pack_latest}} dest={{geoip_dir}} 
+  tags: copiageoip 
+
+- name: descomprimir paquete Geoip
+  unarchive: src={{geoip_pack_latest}}  dest=/usr/local/src
+  tags: descomprimirgeoip   
+
+- name: instalacion Geoip
+  shell: ./configure chdir={{geoip_dir}}/GeoIP-1.6.0/ 
+  tags: instalaciongeoip1
+
+- name: instalacion Geoip
+  shell: make chdir={{geoip_dir}}/GeoIP-1.6.0/ 
+  tags: instalaciongeoip2  
+
+- name: instalacion Geoip
+  shell: make install chdir={{geoip_dir}}/GeoIP-1.6.0/ 
+  tags: instalaciongeoip3 
+
+- name: sobre escribir archivo geoip.conf
+  shell: echo '/usr/local/lib' > /etc/ld.so.conf.d/geoip.conf; ldconfig
+  tags: sobreescribir
+
+ #descargar archivos geoip city y dat
+ 
+- name: crear carpeta geoip /usr/local/share/GeoIP 
+  file: path=/usr/local/share/GeoIP  owner=root group=root mode=0751 state=directory
+  tags: carpetageoip
+
+- name: copiar archivos a /usr/local/share/GeoIP
+  copy: src={{ item }}  dest=/usr/local/share/GeoIP/ 
+  with_items:
+  - "{{geoip_pack_city}}"
+  - "{{geoip_pack_data}}"
+  tags: mvarchivosgeoip
+
+- name: descomprimir archivos geoip
+  shell: chdir=/usr/local/share/GeoIP/  gunzip {{ item }}
+  with_items:
+  - "{{geoip_pack_city}}"
+  - "{{geoip_pack_data}}"
+  ignore_errors: True
+  tags: descomprimiarchivosgeoip
+
+# download modulos para openresty
+
+#- name: dowload modulos
+#  git: repo={{item}} dest={{openresty_dir}}
+# with_items:
+#  - "{{openresty_modulo_dowload_stream}}"
+#  - "{{openresty_modulo_dowload_http}}"
+#  ignore_errors: True
+#  tags: modulos
+
+# modulos
+
+- name: copia openresty_modulo_dowload_hash  en /usr/local/src
+  copy: src={{item}} dest={{openresty_dir}}
+  with_items:
+  - "{{openresty_modulo_dowload_stream}}"
+  - "{{openresty_modulo_dowload_http}}"
+  - "{{openresty_modulo_pack_hash}}"
+  tags: instalacionhash
+
+- name: descomprimir paquete en /usr/local/src
+  unarchive:  src={{item}} dest={{openresty_dir}} copy=yes
+  with_items:
+  - "{{openresty_modulo_dowload_stream}}"
+  - "{{openresty_modulo_dowload_http}}"
+  - "{{openresty_modulo_pack_hash}}"
+  tags: descomprimirmodulohash
+
+- name: cambiar permisos de carperatas 
+  file: path={{item}} owner=root group=root mode=0755 state=touch
+  with_items:
+  - /usr/local/src/nginx-push-stream-module-master/config
+  - /usr/local/src/ngx_http_consistent_hash-master/config
+  - /usr/local/src/ngx_http_substitutions_filter_module-master/config
+  tags: permisos_carpetas 
+
+
+
+# download openresty
+
+- name: download_openresty 
+  copy: src={{openresty_pack_latest}} dest={{openresty_dir}}
+  tags: copyopenresty
+
+- name: descomprimir paquete openresty
+  unarchive: src={{openresty_pack_latest}} dest={{openresty_dir}}
+  tags: descomprimiropenresty
+
+- name: compilacion openresty
+  shell: ./configure {{openresty_compile}} chdir={{openresty_dir}}/ngx_openresty-1.7.7.1
+  tags: compile_operesty
+
+- name: make compliacion openresty
+  shell: make chdir={{openresty_dir}}/ngx_openresty-1.7.7.1
+  tags: make_compile_operesty
+
+- name: make compliacion install openresty
+  shell: make install chdir={{openresty_dir}}/ngx_openresty-1.7.7.1
+  tags: make_install_compile_operesty  
+
+#creacion de carpeta /nginx/client
+
+- name: creacion_de_carpeta_/nginx/client
+  file: path=/var/tmp/nginx/client/ state=directory owner=root group=root mode=0751
+  tags: creacion_carpeta
+
+- name: creacion de carpetas /nginx/cache
+  file: path=/usr/local/nginx/cache/ state=directory owner=nobody group=nobody mode=0755
+  tags: creacion_carpeta_cache
+
+- name: creacion de carpetas /nginx/cache/
+  file: path=/usr/local/nginx/cache/{{ item }} state=directory owner=nobody group=root mode=0700
+  with_items:
+  - docs
+  - imgs
+  - rsz
+  - arch
+  - max
+  tags: creacion_carpeta_cache_varias
+
+- name: creacion de carpetas components
+  file: path=/usr/local/nginx/conf/components state=directory owner=root group=root mode=0755
+  tags: creacion_carpeta_components
+
+- name: copia archivo mime.types en components
+  copy: src={{mime}} dest={{mimeruta}} 
+  tags: copi_mime.types  
+
+#inciar nginx
+
+- name: iniciar servicio nginx
+  shell: /usr/local/bin/nginx
+  ignore_errors: True
+  tags: startnginx
+
+#copiar archivo de configuracion nginx.conf
+- name: copy_archivo_nginx.conf
+  copy: src={{nginxconf}} dest={{nginxconfruta}}
+  tags: copynginxconf
+
+# crea carpetas sites-available y sites-enabled
+- name: crear carpetas sites-available y sites-enabled
+  file: path={{ item }} state=directory owner=root group=root mode=0751
+  with_items:
+  - /usr/local/nginx/conf/sites-available
+  - /usr/local/nginx/conf/sites-enabled
+  tags: carpetassite
+
+

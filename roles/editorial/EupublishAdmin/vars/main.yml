@@ -1,0 +1,12 @@
+
+---
+# vars file
+
+#java_home_6: "/usr/local/jdk1.6.0_33"
+#catalina_home_6: "/usr/local/apache-tomcat-6.0.35"
+
+jdbc_content: "jdbc:oracle:thin:@204.228.236.50:1521/content"
+jdbc_user_content: "content"
+jdbc_pass_content: "P0nZ0n#0$4!"
+
+eupadmin: "EupublishAdmin"

@@ -1,0 +1,16 @@
+---
+# vars file for jboss
+jboss_dir: "/usr/local/jboss"
+
+jboss_log_dir: "{{jboss_dir}}/server/default/log"
+
+jboss_ajp_port: 8009
+
+jboss_redirect_port: 8443
+
+#in milisseconds
+jboss_connection_timeout: 600000
+
+jboss_max_threads: 1500
+
+jboss_buffer_size: 4096

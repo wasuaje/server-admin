@@ -1,0 +1,25 @@
+
+---
+# vars file for gs
+
+name_app: "PUBLISHER-2"
+#java_home_5: "/usr/local/jdk1.5.0_22"
+
+ip_publisher: "{{ ip_service }}"
+port_publisher: "8086"
+ip_media: "http://media.eluniversal.com"
+port_media: "8003"
+
+jdbc_content: "jdbc:oracle:thin:@204.228.236.50:1521:content"
+jdbc_user_publisher: "publisher2"
+jdbc_pass_publisher: "P0nZ0n#0$4!"
+
+jdbc_cvf: "jdbc:oracle:thin:@204.228.236.49:1521:cvf3"
+jdbc_user_cvf: "EMPPUBLISH"
+jdbc_pass_cvf: "n3ur0t#x1n4s"
+
+jdbc_clasif: "jdbc:oracle:thin:@204.228.236.47:1521:clasideu"
+jdbc_user_clasif: "deupublish"
+jdbc_pass_clasif: "c1t0t#x!n4s"
+
+publisher2: "publisher2"

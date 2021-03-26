@@ -1,0 +1,29 @@
+
+# Ansible que instala dynamico eleestampas
+# Wuelfhis Asuaje 
+# Infraestructura de Sistemas
+ 
+- name: asegurar que {{local2}}/scripts exists
+  file: path="{{local2}}/scripts"   state=directory owner=manduca group=manduca recurse=yes
+  tags: scripts
+
+- name: Copio resinDynamicEST.conf desde dinamic estampas
+  shell: cp {{local2}}/{{adminest}}/conf/resinDynamicEST.conf  {{local2}}/scripts/
+  sudo: yes
+  sudo_user: manduca 
+  tags: copy
+
+- name: Copio dynamic_est.sh desde dinamic estampas
+  shell: cp {{local2}}/{{adminest}}/conf/dynamic_est.sh  {{local2}}/scripts/
+  sudo: yes
+  sudo_user: manduca 
+  tags: copy
+
+- name: start dynamic_est.sh desde dinamic estampas
+  shell: chdir={{local2}}/scripts chmod +x dynamic_est.sh &&  ./dynamic_est.sh start
+  sudo: yes
+  sudo_user: manduca 
+  environment: manduca_env
+  tags: startadmin
+
+

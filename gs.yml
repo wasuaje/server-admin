@@ -1,0 +1,6 @@
+# file: gs.yml
+#- hosts: desa-app-edit
+- hosts: clouda
+  user: root  
+  roles:
+    - gs

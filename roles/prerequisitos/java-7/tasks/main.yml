@@ -1,0 +1,27 @@
+
+##Este procedimiento solo funciona p
+
+- name: Copio el java 7 a usr local
+  copy: src={{java_pack}} dest=/usr/local/src
+  tags: jdk732
+
+- name: Descomprimir 
+  shell: tar -zxvf /usr/local/src/{{java_pack}} -C /usr/local
+  tags: jdk732
+
+- name: Hacer duenio a manduca
+  shell: chown manduca.manduca -R {{java_home_7}}
+  tags: jdk732
+  ignore_errors: true
+
+- name: Actualizar variables de ambiente en /etc/profile (para todos)
+  shell: echo {{item}} >> /etc/profile
+  with_items:
+  - "###### SETEADOS AUTOMATICAMENTE CON ANSIBLE #######"
+  - "export JAVA_HOME=/usr/local/jdk7"      
+  - "export PATH=$PATH:/usr/local/jdk7/bin"
+  tags: jdk732
+
+- name: Link symbolico java 7
+  file: src={{java_home_7}} dest={{main_app_home}}/jdk7 state=link
+  tags: jdk732

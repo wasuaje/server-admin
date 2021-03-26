@@ -1,0 +1,70 @@
+
+# Ansible que instala la SearchElasticSearch
+
+- name: asegurar que {{local2}} exists
+  file: path="{{local2}}"   state=directory
+  tags: 
+
+- name:  CVS Loguin SearchElasticSearch
+  shell: cvs -d :pserver:manduca:D3c4r#m6o!A@{{cvs_ip}}:/home/cvs/commons/ login  
+  sudo: yes
+  sudo_user: manduca 
+  tags:   search  
+
+- name:  Checkout del proyecto SearchElasticSearch
+  command: chdir={{local2}} cvs -d :pserver:manduca@{{cvs_ip}}:/home/cvs/commons checkout {{SearchElasticSearch}}  
+  sudo: yes
+  sudo_user: manduca 
+  tags:  search
+
+- name: Copio libs de DEUutil a SearchElasticSearch
+  shell: cp {{local2}}/DEUutil/DEUutil.jar {{local2}}/{{SearchElasticSearch}}/root/WEB-INF/lib/  
+  sudo: yes
+  sudo_user: manduca   
+  tags: search
+
+- name: Reemplazar buildproperties con el template SearchElasticSearch
+  template:
+    src=build.properties.j2
+    dest="{{local2}}/{{SearchElasticSearch}}/conf/build.properties"  
+  sudo: yes
+  sudo_user: manduca   
+  tags: search
+
+- name: Reemplazar applicationContext.xml con el template SearchElasticSearch
+  template:
+    src=applicationContext.xml.j2
+    dest="{{local2}}/{{SearchElasticSearch}}/src/applicationContext.xml"  
+  sudo: yes
+  sudo_user: manduca   
+  tags: search
+
+- name: Reemplazar resin.conf con el template SearchElasticSearch
+  template:
+    src=resin.conf.j2
+    dest="{{local2}}/{{SearchElasticSearch}}/conf/resin.conf"  
+  sudo: yes
+  sudo_user: manduca   
+  tags: search
+
+- name: Reemplazar searchES.sh con el template SearchElasticSearch
+  template:
+    src=searchES.sh.j2
+    dest="{{local2}}/{{SearchElasticSearch}}/conf/searchES.sh"  
+  sudo: yes
+  sudo_user: manduca   
+  tags: search
+
+- name:  run ant build SearchElasticSearch
+  shell: chdir={{local2}}/{{SearchElasticSearch}}/conf export LC_ALL=es_VE.ISO8859-1 && ant build  
+  sudo: yes
+  sudo_user: manduca 
+  environment: manduca_env
+  tags: search
+
+- name:  arranque de SearchElasticSearch
+  shell: chdir={{local2}}/{{SearchElasticSearch}}/conf  chmod +x searchES.sh  && ./searchES.sh start  
+  sudo: yes
+  sudo_user: manduca 
+  environment: manduca_env
+  tags: search

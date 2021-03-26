@@ -1,0 +1,41 @@
+#!/bin/bash
+# produccion
+JAVA_HOME="{{java_home_5}}"
+# DIR ROOT DE RTF's
+RTFS_ROOT="/netapp/local4/rtfparser"
+RTFPARSER_ROOT="/local2/applications/rtfparser"
+
+# CONF DE BD
+DB_SERVER="{{DB_SERVER}}"
+DB_INSTANCE="{{DB_INSTANCE}}"
+DB_USER="{{DB_USER}}"
+DB_PASS="{{DB_PASS}}"
+DB_PORT="{{DB_PORT}}"
+BIN_HOME="{{BIN_HOME}}"
+
+# LISTA DE CORREOS
+EMAILS="kecheverri@eluniversal.com"
+
+
+export RTFS_ROOT BIN_HOME USR_BIN_HOME EMAILS
+export DB_SERVER DB_INSTANCE DB_USER DB_PASS DB_PORT
+
+# UNZIP/UNTAR RTFS
+cd $RTFS_ROOT/rtfs
+$BIN_HOME/unzip -o $RTFS_ROOT/rtfs`date '+%Y%m%d'`.zip -d $RTFS_ROOT
+$BIN_HOME/gunzip -fd $RTFS_ROOT/rtfs/clasificados.tar.gz
+$BIN_HOME/tar -xf $RTFS_ROOT/rtfs/necros.tar
+$BIN_HOME/tar -xf $RTFS_ROOT/rtfs/edictos.tar
+$BIN_HOME/tar -xf $RTFS_ROOT/rtfs/clasificados.tar
+$BIN_HOME/rm -rf $RTFS_ROOT/rtfs`date '+%Y%m%d'`.zip
+$BIN_HOME/rm -rf $RTFS_ROOT/rtfs/*.tar
+$BIN_HOME/date
+
+# INSERT RTFS INTO DB
+MY_CLASSPATH="$RTFPARSER_ROOT/bin:$RTFPARSER_ROOT/lib/srcCommons.jar:$RTFPARSER_ROOT/lib/log4j-1.2.4.jar:$RTFPARSER_ROOT/lib/commons-resources.jar:$RTFPARSER_ROOT/lib/activation.jar:$RTFPARSER_ROOT/lib/ojdbc14.jar:$RTFPARSER_ROOT/lib/commons-dbcp2.jar:$RTFPARSER_ROOT/lib/commons-pool.jar:$RTFPARSER_ROOT/lib/mail.jar:$RTFPARSER_ROOT/lib/commons-collections-3.2.jar:. -Djava.awt.headless=true"
+
+# PARA IMPORTAR UNA FECHA DADA, PASAR LA FECHA COMO ULTIMO PARAMETRO EN ESTA LLAMADA
+$JAVA_HOME/bin/java -classpath $MY_CLASSPATH com.manduca.rtf.NE.Reader $DB_SERVER $DB_INSTANCE $DB_USER $DB_PASS $DB_PORT $RTFS_ROOT/rtfs
+
+$JAVA_HOME/bin/java -classpath $MY_CLASSPATH com.manduca.classified.Reader -ip $DB_SERVER -sid $DB_INSTANCE -username $DB_USER -password $DB_PASS -port $DB_PORT -d $RTFS_ROOT/rtfs -emails $EMAILS
+

@@ -1,0 +1,105 @@
+# file: publi_app01.yml
+#- hosts: desa-app-edit
+#- hosts: publi01
+- hosts: 204.228.236.16
+  user: root  
+  gather_facts: True
+  vars: 
+  - main_app_home: "/usr/local"
+  - local2: "/local2/applications/"
+  - ant_exe: "/usr/local/ant/bin/ant"
+  - manduca_pass: ""
+  - publica_pass: ""
+  - crons_pass: ""
+  - tomcat_port: "80"
+  - tomcat_ip: "204.228.236.24"
+  - cvs_ip: "190.153.52.48"
+  - java_home: "{{main_app_home}}/jdk7"    #necesario porque los prerequisitos andan primero que el seteo de vars
+  - catalina_home: "{{main_app_home}}/apache-tomcat"
+  - manduca_env:
+      JAVA_HOME: "/usr/local/jdk7"
+      ANT_HOME: "/usr/local/ant"
+      LANG: "es_VE.ISO8859-1"  
+      PATH: "PATH=/usr/lib64/qt-3.3/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/local/jdk7/bin:/usr/local/ant/bin:/home/manduca/bin"          
+  roles:    
+  #prerequisitos 
+   - prerequisitos/java-7u65
+   - prerequisitos/apache-ant  
+   - prerequisitos/tomcat-755 
+   - prerequisitos/elastic-0-20-6
+  #aplicacion editorial
+   - editorial/DEUutil          
+   - editorial/OpenXavaFramework
+   - editorial/EupublishAdmin
+   - editorial/ContestAdmin   
+   - editorial/DeuMovil
+   - editorial/EUElecciones
+  
+  # Ejectucar asi:
+  # para desarrollo
+  # ansible-playbook -i desa  server_app03.yml   -vvv -C
+  # para produccion
+  # ansible-playbook -i prod  server_app03.yml   -vvv -C
+  
+  # Tareas como tal/
+  tasks:    
+ 
+    - name: Actualizar variables de ambiente en /etc/profile (para todos)
+      shell: echo {{item}} >> /etc/profile
+      with_items:
+      - "###### SETEADOS AUTOMATICAMENTE CON ANSIBLE #######"
+      - "export JAVA_HOME=/usr/local/jdk7"
+      - "export ANT_HOME=/usr/local/ant"
+      - "export LANG=es_VE.ISO8859-1"      
+      - "export PATH=$PATH:$JAVA_HOME/bin:$ANT_HOME/bin"
+      tags: env
+
+    - name: Valores umask para los usuarios
+      shell: echo "umask 002" >> /home/{{item}}/.bash_profile
+      with_items:
+      - "manduca"    
+      tags: umask
+
+    # - name: Crear Carpetas indexClasificados, indexEmpleos      
+    #   file: path={{item}}   state=directory
+    #   with_items:
+    #   - /indexClasificados
+    #   - /indexEmpleo
+    #   tags: folders
+    
+          
+    - name: Link symbolico java 7
+      file: src={{java_home_7u65}} dest={{main_app_home}}/jdk7 owner=manduca group=manduca state=link
+      tags: links
+
+    - name: Link symbolico ant
+      file: src={{ant_home}} dest={{main_app_home}}/ant owner=manduca group=manduca state=link
+      tags: links
+
+    - name: Link symbolico Tomcat
+      file: src={{tomcat_dir}} dest={{main_app_home}}/apache-tomcat owner=manduca group=manduca state=link
+      tags: links 
+    
+
+    - name: Instala memcached de repositorios
+      yum: name=memcached state=present
+      tags: memcached
+
+    - name: Levanta memcached
+      shell: /etc/init.d/memcached start
+      tags: memcached
+
+    - name: configures the setenv.sh script   #lo copio en este paso para respetar los links simbolicos de mas arriba
+      template:
+        src=roles/prerequisitos/tomcat-755/templates/setenv.sh.j2
+        dest="{{tomcat_dir}}/bin/setenv.sh"
+        mode=0755
+      tags: tomcat
+
+    - name: ensures tomcat is restarted
+      shell: "nohup {{tomcat_dir}}/tomcat.sh &"
+      tags: tomcat
+
+    - name: Directorio local2 existe y pertenece a manduca      
+      file: path="/local2/applications"   state=directory owner=manduca group=manduca recurse=yes
+      tags: manduquea

@@ -1,0 +1,5 @@
+#vars for java 5
+
+resin_pack_3026: 'resin-3.0.26-src.zip'
+
+resin_home_3026: '/usr/local/resin-3.0.26'

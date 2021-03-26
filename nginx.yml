@@ -1,0 +1,92 @@
+# file: nginx.yml
+#- hosts: desa-app-edit
+# EJECUTESE ASI ansible-playbook -i prod  -l  involta-web nginx.yml -v -u root 
+# EJECUTESE ASI ansible-playbook -i desa -l webtest01 nginx.yml -vvv -C
+
+- hosts: all
+  user: root  
+  gather_facts: True  
+  vars:      
+    nginx_home: "/usr/local/nginx/"
+    nginx_enabl: "conf/sites-enabled/"
+    nginx_avail: "conf/sites-available/"
+    nginx_comp: "conf/components/"
+    templates:             
+      # - static.estampas.conf      
+      # - clasificadoseluniversal.conf
+      # - dev-clasificadoseluniversal.conf
+      # - payment.conf
+      # - server-status
+      # - forward-proxy.conf
+      # - services.clasificadoseluniversal.conf
+      # - services-dev.clasificadoseluniversal.conf      
+      #  - estampas.conf
+      # - admin.empleos.conf
+      # - movil.conf
+      # - image-magick.conf      
+      # - empleos.conf
+      #  - widgets.conf
+      # - eupublish.eluniversal.conf
+      #  - subdominios.eluniversal.conf
+      # - static.eluniversal.conf
+      # - media.eluniversal.conf
+      # - kibana.eluniversal.conf
+      # - anunciantes.eluniversal.conf
+      # - publisher.eluniversal.conf
+      # - search.eluniversal.conf
+      #  - www.eluniversal.conf      
+      # - admin.eluniversal.conf
+      # - dev-admin.eluniversal.conf
+    components:
+        # - movil-brasil2014-rewrites.conf
+        # - x-ua-compatible.conf
+        # - no-transform.conf
+        #  - push_streams.conf
+        # - cross-domain-ajax.conf
+        # - eluniversal-eufutbol.conf        
+        # - eluniversal-static-elasticserach.conf
+        # - eluniversal-subs-filters.conf
+        # - eluniversal-static-json.conf
+        # - eluniversal-landing-pages.conf
+        # - eluniversal-brasil-2014.conf
+        # - eluniversal-copa-america-2015.conf
+        # - eluniversal-beisbol-2014.conf
+        # - eluniversal-ipad.conf
+         - eluniversal-rewrites.conf
+        # - h5bp.conf
+        # - mime.types
+        # - movil-rewrites.conf
+        #  - static-brasil-2014.conf
+        #  - bb_rules.conf
+        # - block.conf        
+        # - cache-file-descriptors.conf        
+        # - eu-rewrites.conf                  OJO NO SE UTILIZA        
+        # - movil-landing-pages.conf
+        # - movil-eurunners.conf        
+        # - movil-torneo-apertura-2014-rewrites.conf
+        # - movil-eufutbol-rewrites.conf
+        # - movil-beisbol-2014.conf
+        # - movil-proxycache.conf
+        # - cache-busting.conf        
+        # - dont-log-common-404.conf
+        # - push_stream_locations.conf
+        # - os-mobile-device.conf
+        # - cross-domain-fonts.conf        
+        # - expires.conf
+        # - http-block-invalid-host.conf
+        # - protect-system-files.conf
+        # - http-identify-bad-guys.conf
+        # - block-bad-guys.conf    
+
+  roles:
+    - nginx
+
+  tasks:   
+  #- debug: var=hostvars
+  - include: roles/nginx/tasks/components.yml    
+  #- include: roles/nginx/tasks/sites.yml
+  #esto se ejecuta al final 
+  - name: Reiniciar Nginx
+    shell: nginx -s reload
+    tags: nginx-reload
+    #ignore_errors: true

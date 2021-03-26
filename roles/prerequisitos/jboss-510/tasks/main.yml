@@ -1,0 +1,14 @@
+
+##Este procedimiento solo funciona p
+
+- name: Copio el jboss a usr local src
+  copy: src={{jboss_pack_510}} dest=/usr/local/src
+  tags: jboss510
+
+- name: Descomprimir jboss
+  shell: unzip /usr/local/src/{{jboss_pack_510}} -d /usr/local/
+  tags: jboss510
+
+- name: Hacer dueño a manduca
+  shell: chown manduca.manduca -R {{jboss_home_510}}
+  tags: jboss510

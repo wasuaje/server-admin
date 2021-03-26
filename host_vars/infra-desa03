@@ -1,0 +1,4 @@
+app03_ip: "10.3.1.14"
+app02_ip: "10.3.1.13"
+app01_ip: "10.3.1.14"
+service_ip: "{{ ansible_all_ipv4_addresses[1] }}"

@@ -1,0 +1,25 @@
+
+---
+# vars file
+
+#java_home_5: "/usr/local/jdk1.5.0_22"
+
+ip_app: "{{ ip_service }}"
+port_app: "7100"
+ip_cluster: "{{ ip_service }}"
+port_cluster: "6803"
+
+jdbc_user_dynamic: "dynamicest"
+jdbc_pass_dynamic: "P0nZ0n#0$4!"
+
+jdbc_content: "jdbc:oracle:thin:@204.228.236.50:1521:content"
+
+ip_app_eu: "{{ ip_service }}"
+port_app_eu: "8100"
+ip_cluster_eu: "{{ ip_service }}"
+port_cluster_eu: "6802"
+
+jdbc_user_dynamic_eu: "dynamiceu"
+jdbc_pass_dynamic_eu: "P0nZ0n#0$4!"
+
+AjaxConnection: "ajaxConnection"

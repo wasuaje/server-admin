@@ -1,0 +1,69 @@
+---
+
+
+- name: download Tomcat
+  action: get_url
+      url="{{tomcat_download_url}}"
+      dest="{{tomcat_download_dir}}/{{tomcat_package}}"
+  tags: download
+
+- name: unpacks Tomcat
+  shell: tar -zxvf {{tomcat_download_dir}}/{{tomcat_package}} -C /usr/local
+  tags: unpack
+
+- name: ensures {{tomcat_dir}} exists
+  file: path="{{tomcat_dir}}"   state=directory
+  tags: unpack
+
+- name: ensures Tomcat context config folder exists
+  file:
+    path="{{tomcat_dir}}/conf/Catalina/localhost"
+    state=directory
+
+- name: ensures {{tomcat_log_dir}} exists
+  file:
+    path="{{tomcat_log_dir}}"
+    state=directory
+
+- name: configures server.xml
+  template:
+    src=server.xml.j2
+    dest="{{tomcat_dir}}/conf/server.xml"
+
+- name: configures tomcat-users.xml
+  template:
+    src="tomcat-users.xml.j2"
+    dest="{{tomcat_dir}}/conf/tomcat-users.xml"
+
+- name: configures logging.properties
+  template:
+    src="logging.properties.j2"
+    dest="{{tomcat_dir}}/conf/logging.properties"
+
+- name: creates tomcat.sh
+  template:
+    src="tomcat.sh.j2"
+    dest="{{tomcat_dir}}/tomcat.sh"
+    mode=0700
+
+- name: ensures executable scripts have the right permissions
+  file:
+    path="{{tomcat_dir}}/bin/{{item}}"
+    mode=0755
+    state=file
+  with_items:
+    - startup.sh
+    - catalina.sh
+    - shutdown.sh
+  ignore_errors: True
+
+# - name: configures the setenv.sh script
+#   template:
+#     src=setenv.sh.j2
+#     dest="{{tomcat_dir}}/bin/setenv.sh"
+#     mode=0755
+
+
+# - name: ensures tomcat is restarted
+#   shell:
+#     "nohup {{tomcat_dir}}/tomcat.sh &"

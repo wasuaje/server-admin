@@ -1,0 +1,104 @@
+
+# Ansible que instala Registro
+
+- name: asegurar que {{local2}} exists
+  file: path="{{local2}}"   state=directory owner=manduca group=manduca recurse=yes
+  tags: cvs
+
+- name:  CVS Loguin {{registro}}
+  shell: cvs -d :pserver:manduca:D3c4r#m6o!A@{{cvs_ip}}:/home/cvs/commons/ login
+  sudo: yes
+  sudo_user: manduca
+  tags:  cvs
+
+- name:  Checkout del proyecto {{registro}}
+  command: chdir={{local2}} cvs -d :pserver:manduca@{{cvs_ip}}:/home/cvs/commons checkout {{registro}}
+  sudo: yes
+  sudo_user: manduca
+  tags: registro
+
+- name:  Ant config {{registro}}
+  shell: chdir={{local2}}/{{registro}}/conf export LC_ALL=es_VE.ISO8859-1 && ant cvsConfigP
+  sudo: yes
+  sudo_user: manduca
+  environment: manduca_env
+  tags: registro
+
+- name: asegurar que {{local2}}/{{registro}}/rootAdmin/WEB-INF/lib exists
+  file: path="{{local2}}/{{registro}}/rootAdmin/WEB-INF/lib"  state=link  src="{{local2}}/lib"  owner=manduca group=manduca 
+  tags: registro
+
+- name: asegurar que {{local2}}/{{registro}}/root/WEB-INF/lib exists
+  file: path="{{local2}}/{{registro}}/root/WEB-INF/lib"  state=link  src="{{local2}}/lib"  owner=manduca group=manduca 
+  tags: registro
+
+
+- name: Copio libs de DEUutil a {{local2}}/{{registro}}/rootAdmin/WEB-INF/lib
+  shell: cp {{local2}}/DEUutil/DEUutil.jar {{local2}}/{{registro}}/rootAdmin/WEB-INF/lib/
+  sudo: yes
+  sudo_user: manduca
+  tags: registro
+
+- name: Copio libs de SrcCommons a {{local2}}/{{registro}}/rootAdmin/WEB-INF/lib
+  shell: cp {{local2}}/srcCommons/srcCommons.jar {{local2}}/{{registro}}/rootAdmin/WEB-INF/lib/
+  sudo: yes
+  sudo_user: manduca
+  tags: registro
+
+- name: Copio libs de apiSearchElasticSearch.jar a {{local2}}/{{registro}}/rootAdmin/WEB-INF/lib
+  shell: cp {{local2}}/ApiSearchElasticSearch/apiSearchElasticSearch.jar {{local2}}/{{registro}}/rootAdmin/WEB-INF/lib/
+  sudo: yes
+  sudo_user: manduca
+  tags: registro
+
+- name: Copio libs de migrateToElasticSearch.jar a {{local2}}/{{registro}}/rootAdmin/WEB-INF/lib
+  shell: cp {{local2}}/MigrateToElasticSearch/migrateToElasticSearch.jar {{local2}}/{{registro}}/rootAdmin/WEB-INF/lib/
+  sudo: yes
+  sudo_user: manduca
+  tags: registro
+
+
+- name: Reemplazar buildproperties con el template {{registro}}
+  template:
+    src=build.properties.j2
+    dest="{{local2}}/{{registro}}/conf/build.properties"
+  sudo: yes
+  sudo_user: manduca
+  tags: registro
+
+- name: Reemplazar admin.sh con el template {{registro}}
+  template:
+    src=admin.sh.j2
+    dest="{{local2}}/{{registro}}/conf/admin.sh"
+  sudo: yes
+  sudo_user: manduca
+  tags: registro
+
+- name: Reemplazar resinAdmin.conf con el template {{registro}}
+  template:
+    src=resinAdmin.conf.j2
+    dest="{{local2}}/{{registro}}/conf/resinAdmin.conf"
+  sudo: yes
+  sudo_user: manduca
+  tags: registro
+
+- name:  run ant build {{registro}}
+  shell: chdir={{local2}}/{{registro}}/conf export LC_ALL=es_VE.ISO8859-1 && ant build
+  sudo: yes
+  sudo_user: manduca
+  environment: manduca_env
+  tags: registro
+
+- name:  run ant build2 {{registro}}
+  shell: chdir={{local2}}/{{registro}}/conf export LC_ALL=es_VE.ISO8859-1 && ant buildEU
+  sudo: yes
+  sudo_user: manduca
+  environment: manduca_env
+  tags: registro
+
+
+
+
+
+
+

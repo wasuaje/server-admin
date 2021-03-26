@@ -1,0 +1,67 @@
+
+- hosts: involta-web
+  user: root  
+  gather_facts: True
+  vars:  
+  - download_url: "http://www.carfab.com/apachesoftware//httpd/httpd-2.2.29.tar.gz"
+  - apache_pack: "httpd-2.2.29.tar.gz"
+  - apache_dir: "httpd-2.2.29"
+  - main_app_home: "/usr/local"
+  - apache_port: "80"
+  - apache_ip: "204.228.236.22" #sustituir por fact en la ip de servicio
+  - configure: "--prefix=/usr/local/apache --enable-nonportable-atomics=yes \ 
+		--enable-cache \ 
+		--enable-mem-cache  \ 
+		--enable-disk-cache  \ 
+		--enable-deflate  \ 
+		--enable-expires  \ 
+		--enable-headers \ 
+		--enable-log-config \ 
+		--enable-rewrite \ 
+		--enable-suexec \ 
+		--enable-autoindex \ 
+		--enable-asis  \ 
+		--enable-cgi  \ 
+		--enable-cgid  \ 
+		--enable-filter \ 
+		--enable-negotiation \ 
+		--enable-proxy \ 
+		--enable-proxy_http \ 
+		--enable-status  \ 
+		--enable-authn_file \ 
+		--enable-auth_basic \ 
+		--enable-authn_default \ 
+		--enable-authz_user \ 
+		--enable-authz_default \ 
+		--enable-authz_groupfile \ 
+		--enable-authz_host  \ 
+		--enable-actions  \ 
+		--enable-userdir \ 
+		--enable-version \ 
+		--with-mpm=worker \ 
+		--with-suexec-caller=102 "
+  
+  tasks:
+
+   - name: Instalar Prerequisitos de Apache
+     yum: name={{ item }} state=present
+     with_items: 
+     - apr-util
+     - apr-util-devel
+     tags: apache_prereqs
+
+   - name: Descarga de instalador de apache
+     shell: chdir="{{main_app_home}}/src" wget "{{download_url}}"
+     tags: apache_down
+  
+   - name: Descomprimir apache
+     shell: chdir="{{main_app_home}}/src" tar -zxvf {{main_app_home}}/src/{{apache_pack}}
+     tags: apache_untar
+
+   - name: Configure apache
+     shell: chdir="{{main_app_home}}/src/{{apache_dir}}" ./configure {{configure}}
+     tags: apache_config
+
+   - name: Instala Apache apache
+     shell: chdir="{{main_app_home}}/src/{{apache_dir}}" make -j2 && make install -j2
+     tags: apache_install
